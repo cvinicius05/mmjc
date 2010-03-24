@@ -77,7 +77,7 @@ Tokens
 
 	// Outros
     id     = letter (letter | digit | '_')*;
-    number = posdigit digit*;
+    number = '0' | (posdigit digit*);
 
 	// Ignorados
     blank   = (white | eol)+;
