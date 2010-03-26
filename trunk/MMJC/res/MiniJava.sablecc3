@@ -37,7 +37,7 @@ Helpers
 Tokens
 	// Identificadores
     intt    = 'int';
-    intv    = 'int' white+ '[' white+ ']';
+    intv    = 'int' white* '[' white* ']';
     bool    = 'boolean';
     classtk = 'class';
     public  = 'public';
@@ -150,9 +150,13 @@ Productions
 
     type
         = {intt}  intt
+			{ -> New type.intt() }
         | {intv}  intv
+			{ -> New type.intv() }
         | {bool}  bool
-        | {class} id;
+			{ -> New type.bool() }
+        | {class} id
+			{ -> New type.class(id) };
 
 	noarrayexpr { -> expression }
         = {name}    id
@@ -274,8 +278,8 @@ Abstract Syntax Tree
         | {self} ;
     
     type
-        = {intt}  intt
-        | {intv}  intv
-        | {bool}  bool
+        = {intt}
+        | {intv}
+        | {bool}
         | {class} id;
 
