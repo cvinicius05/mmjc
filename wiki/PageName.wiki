@@ -1,0 +1,10 @@
+#summary Guia de mudanças diretas no código gerado pelo Sablecc
+#labels Phase-Design
+
+=== Mudanças a realizar ===
+
+  * adicionar métodos e variáveis para determinar os tipos de cada produção nas fases semânticas
+
+
+=== Mudanças realizadas ===
+  * nenhuma
