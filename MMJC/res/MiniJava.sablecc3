@@ -22,7 +22,6 @@ Package ufc.ck017.mmjc;
 Helpers
 	anychar      = [0x0 .. 0xfff];
 	digit        = ['0' .. '9'];
-	posdigit     = ['1' .. '9'];
 	letter       = [['a' .. 'z'] + ['A' .. 'Z']];
 	cr           = 13;
 	lf           = 10;
@@ -77,7 +76,7 @@ Tokens
 
 	// Outros
     id     = letter (letter | digit | '_')*;
-    number = '0' | (posdigit digit*);
+    number = '0' | ([digit - '0'] digit*);
 
 	// Ignorados
     blank   = (white | eol)+;
@@ -282,4 +281,3 @@ Abstract Syntax Tree
         | {intv}
         | {bool}
         | {class} id;
-
