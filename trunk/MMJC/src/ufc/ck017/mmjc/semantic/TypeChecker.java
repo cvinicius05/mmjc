@@ -54,7 +54,7 @@ public class TypeChecker extends DepthFirstAdapter {
 		if(idst == SemanticType.INVALID) {
 			errors.addError(SemanticError.idNotFound(identifier));
 			//node.setType(SemanticType.INVALID);
-		} else if(idst != exst || exst == SemanticType.NONE || exst == SemanticType.INVALID || table.isMethod(currclass, identifier) || table.isClass(identifier)) {
+		} else if(!table.isVar(identifier) || idst != exst || exst == SemanticType.NONE || exst == SemanticType.INVALID) {
 			errors.addError(SemanticError.invalidAtb(node));
 			//node.setType(SemanticType.INVALID);
 		} else {
@@ -117,7 +117,7 @@ public class TypeChecker extends DepthFirstAdapter {
 		if(idst == SemanticType.INVALID) {
 			errors.addError(SemanticError.idNotFound(mname));
 			//node.setType(SemanticType.INVALID);
-		} else if(!table.isMethod(null, mname)) { // TODO modificar para a classe do objeto em questao
+		//} else if(!table.isMethod(null, mname)) { // TODO modificar para a classe do objeto em questao
 			errors.addError(SemanticError.methodExpected(mname));
 		} else if(checkExprType(object, SemanticType.OBJECT)) {
 			//node.setType(idst);
