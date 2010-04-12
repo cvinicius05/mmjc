@@ -4,6 +4,7 @@
 === Mudanças a realizar ===
 
   * adicionar métodos e variáveis para determinar os tipos de cada produção nas fases semânticas
+  * adicionar cálculo de posição para produções da AST
 
 
 === Mudanças realizadas ===
