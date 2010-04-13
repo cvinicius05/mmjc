@@ -1,28 +1,32 @@
 package ufc.ck017.mmjc.semantic;
 
+import java.util.LinkedList;
+import java.util.Stack;
+
 import ufc.ck017.mmjc.analysis.DepthFirstAdapter;
 import ufc.ck017.mmjc.node.*;
+import ufc.ck017.mmjc.symbolTable.TypeSymbol;
 import ufc.ck017.mmjc.util.ErrorLog;
 import ufc.ck017.mmjc.util.SemanticError;
-import ufc.ck017.mmjc.util.SemanticType;
 
 public class TypeChecker extends DepthFirstAdapter {
 	private SymbolTable table = null;
 	private ErrorLog errors = ErrorLog.getInstance();
-	// TODO descobrir como gerenciar isso... Uma pilha, talvez. Mas como saber a classe e o metodo ao mesmo tempo? Talvez duas, então...
-	private TId currclass = null;
-	private TId currmethod = null;
-	private TId parent = null;
+	private Stack<TypeSymbol> currclass = null;
+	private final TypeSymbol INTT = null; //TypeSymbol.getIntTSymbol();
+	private final TypeSymbol INTV = null; //TypeSymbol.getIntVSymbol();
+	private final TypeSymbol BOOL = null; //TypeSymbol.getBoolSymbol();
 	
 	public TypeChecker(SymbolTable symbols) {
 		table = symbols;
+		currclass = new Stack<TypeSymbol>();
 	}
 	
-	private boolean checkExprType(PExpression expression, SemanticType type) {
-		SemanticType exst = SemanticType.BOOL;
-		//SemanticType exst = expression.getType();
+	private boolean checkExprType(PExpression expression, TypeSymbol type) {
+		TypeSymbol exst = BOOL;
+		//TypeSymbol exst = expression.getType();
 		
-		if(exst != SemanticType.BOOL) {
+		if(exst != type) {
 			errors.addError(SemanticError.expectedExprType(expression, type, exst));
 			return true;
 		} else 
@@ -30,35 +34,76 @@ public class TypeChecker extends DepthFirstAdapter {
 	}
 	
 	@Override
+	public void inAExtNextclass(AExtNextclass node) {
+		table.enterScope(node.getName());
+		currclass.push(TypeSymbol.symbol(node.getName().getText()));
+	}
+	
+	@Override
+	public void outAExtNextclass(AExtNextclass node) {
+		table.exitScope();
+		currclass.pop();
+	}
+	
+	@Override
+	public void inANonextNextclass(ANonextNextclass node) {
+		table.enterScope(node.getId());
+		currclass.push(TypeSymbol.symbol(node.getId().getText()));
+	}
+	
+	@Override
+	public void outANonextNextclass(ANonextNextclass node) {
+		table.exitScope();
+		currclass.pop();
+	}
+	
+	@Override
+	public void inAMethod(AMethod node) {
+		table.enterScope(node.getId());
+	}
+	
+	@Override
+	public void outAMethod(AMethod node) {
+		table.exitScope();
+	}
+	
+	@Override
 	public void outAIfStatement(AIfStatement node) {
 		PExpression expression = node.getExpression();
 		
-		if(checkExprType(expression, SemanticType.BOOL)) {
+		if(checkExprType(expression, BOOL)) {
 			//node.setType(SemanticType.NONE);
 		} else {
 			//node.setType(SemanticType.INVALID);
 		}
 	}
 	
-	// TODO Verificar se a atribuicao entre objetos eh valida (se as classes sao a mesma ou se sao compativeis)
-	// TODO Criar uma "arvore de heranca" para ajudar
 	@Override
 	public void outAAtbStatement(AAtbStatement node) {
 		TId identifier = node.getId();
 		PExpression expression = node.getExpression();
 		
-		SemanticType idst = SemanticType.INT, exst = SemanticType.INT;
-		//SemanticType idst = table.getType(identifier);
-		//SemanticType exst = expression.getType();
+		TypeSymbol idst = INTT, exst = INTT;
+		//TypeSymbol idst = table.getType(identifier);
+		//TypeSymbol exst = expression.getType();
 		
-		if(idst == SemanticType.INVALID) {
+		if(idst == null) {
 			errors.addError(SemanticError.idNotFound(identifier));
 			//node.setType(SemanticType.INVALID);
-		} else if(!table.isVar(identifier) || idst != exst || exst == SemanticType.NONE || exst == SemanticType.INVALID) {
+		} else if(!table.isVar(identifier) || idst != exst || exst == null) {
 			errors.addError(SemanticError.invalidAtb(node));
 			//node.setType(SemanticType.INVALID);
-		} else {
-			//node.setType(idst);
+		} else if(table.isObject(identifier)) {
+			TypeSymbol classtype = INTT;
+			//TypeSymbol classname = expression.getType();
+						
+			if(!table.isClass(classtype)) 
+				errors.addError(SemanticError.invalidAtbToObject(identifier, classtype));
+			else if(!table.isSubclassOf(identifier, classtype))
+				errors.addError(SemanticError.incompatibleClassAtb(identifier, classtype));
+			else {
+				//node.setType(idst);
+			}
 		}
 	}
 	
@@ -68,15 +113,15 @@ public class TypeChecker extends DepthFirstAdapter {
 		PExpression iexpression = node.getI();
 		PExpression vexpression = node.getV();
 		
-		SemanticType idst = SemanticType.INT, iexst = SemanticType.INT, vexst = SemanticType.INT;
-		//SemanticType idst = table.getType(identifier);
-		//SemanticType iexst = iexpression.getType();
-		//SemanticType vexst = vexpression.getType();
+		TypeSymbol idst = INTT, iexst = INTT, vexst = INTT;
+		//TypeSymbol idst = table.getType(identifier);
+		//TypeSymbol iexst = iexpression.getType();
+		//TypeSymbol vexst = vexpression.getType();
 		
-		if(idst == SemanticType.INVALID) {
+		if(idst == null) {
 			errors.addError(SemanticError.idNotFound(identifier));
 			//node.setType(SemanticType.INVALID);
-		} else if(idst != SemanticType.INTV || iexst != SemanticType.INT || vexst != SemanticType.INT) {
+		} else if(idst != INTV || iexst != INTT || vexst != INTT) {
 			errors.addError(SemanticError.invalidAtb(node));
 			//node.setType(SemanticType.INVALID);
 		} else {
@@ -88,7 +133,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	public void outAWhileStatement(AWhileStatement node) {
 		PExpression expression = node.getExpression();
 		
-		if(checkExprType(expression, SemanticType.BOOL)) {
+		if(checkExprType(expression, BOOL)) {
 			//node.setType(SemanticType.NONE);
 		} else {
 			//node.setType(SemanticType.INVALID);
@@ -99,11 +144,9 @@ public class TypeChecker extends DepthFirstAdapter {
 	public void outAPrintStatement(APrintStatement node) {
 		PExpression expression = node.getExpression();
 		
-		if(checkExprType(expression, SemanticType.INT)) {
-			//node.setType(SemanticType.NONE);
-		} else {
-			//node.setType(SemanticType.INVALID);
-		}
+		if(!checkExprType(expression, INTT)) 
+			errors.addError(SemanticError.invalidTypePrint(expression));
+		//node.setType(null);
 	}
 	
 	@Override
@@ -111,16 +154,29 @@ public class TypeChecker extends DepthFirstAdapter {
 		PExpression object = node.getObj();
 		TId mname = node.getId();
 		
-		SemanticType idst = SemanticType.INT;
+		TypeSymbol idst = INTT;
 		//SemanticType idst = table.getType(mname);
 		
-		if(idst == SemanticType.INVALID) {
+		if(idst == null) {
 			errors.addError(SemanticError.idNotFound(mname));
-			//node.setType(SemanticType.INVALID);
-		//} else if(!table.isMethod(null, mname)) { // TODO modificar para a classe do objeto em questao
-			errors.addError(SemanticError.methodExpected(mname));
-		} else if(checkExprType(object, SemanticType.OBJECT)) {
-			//node.setType(idst);
+			//node.setType(null);
+		} else {
+			LinkedList<PExpression> params = node.getPar();
+			LinkedList<TypeSymbol> paramtypes = new LinkedList<TypeSymbol>();
+			TypeSymbol objtype = null; //object.getType();
+			
+			for(PExpression exp : params) 
+				paramtypes.add(null /*exp.getType()*/);
+			
+			if(!table.isClass(objtype)) {
+				errors.addError(SemanticError.objectExpected(object));
+				//node.setType(null);
+			} else if(!table.isMethod(objtype, mname, paramtypes)) {
+				errors.addError(SemanticError.methodExpected(objtype, mname));
+				//node.setType(null);
+			} else {
+				//node.setType(table.getType(object.getType(), mname));
+			}
 		}
 	}
 }
