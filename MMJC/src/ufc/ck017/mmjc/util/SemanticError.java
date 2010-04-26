@@ -6,6 +6,14 @@ import ufc.ck017.mmjc.node.PExpression;
 import ufc.ck017.mmjc.node.TId;
 import ufc.ck017.mmjc.symbolTable.TypeSymbol;
 
+/**
+ * F&aacute;brica de {@link String}s representativas dos erros sem&acirc;nticos que podem
+ * ocorrer durante as fases de cria&ccedil;&atilde;o da Tabela de S&iacute;mbolos e de
+ * checagem de tipos do compilador.
+ * Elas ser&atilde;o os erros visualizados pelo usu&aacute;rio ao fim dessas fases.  
+ * 
+ * @author Arthur Rodrigues
+ */
 public class SemanticError {
 	// TODO Melhorar as mensagens de erro, dizendo por exemplo os tipos esperados e os obtidos.
 	
@@ -30,11 +38,11 @@ public class SemanticError {
 	}
 
 	public static String invalidAtbToObject(TId idst, TypeSymbol classtype) {
-		return "Semantic error at ["+idst.getLine()+','+idst.getPos()+"]:\n\tIdentifier has type <"+TypeSymbol.symbol(idst.getText())+"> but was assigned an incompatible value of type <"+classtype+">.";
+		return "Semantic error at ["+idst.getLine()+','+idst.getPos()+"]:\n\tIdentifier has type <"+TypeSymbol.symbolOfID(idst)+"> but was assigned an incompatible value of type <"+classtype+">.";
 	}
 
 	public static String incompatibleClassAtb(TId idst, TypeSymbol classtype) {
-		return "Semantic error at ["+idst.getLine()+','+idst.getPos()+"]:\n\tThe class <"+TypeSymbol.symbol(idst.getText())+"> is not a superclass of the <"+classtype+"> class.";
+		return "Semantic error at ["+idst.getLine()+','+idst.getPos()+"]:\n\tThe class <"+TypeSymbol.symbolOfID(idst)+"> is not a superclass of the <"+classtype+"> class.";
 	}
 
 	public static String invalidTypePrint(PExpression expr) {
