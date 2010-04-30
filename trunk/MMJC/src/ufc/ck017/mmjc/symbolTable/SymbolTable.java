@@ -11,22 +11,22 @@ import ufc.ck017.mmjc.semantic.SymbolTableInterface;
 /**
  * Classe que implementa a gera&ccedil;&atilde;o da Tabela de
  * S&iacute;mbolos, a partir de uma Tabela de S&iacute;mbolos
- * Abstrata, como em {@link AbstractSymbolTable}, para a fase
+ * Abstrata, como em {@link ConcreteSymbolList}, para a fase
  * de an&aacute;lise sem&acirc;ntica e seus m&eacute;todos de
  * acesso segundo a interface {@link SymbolTableInterface}. 
  * 
  * @author vinicius
- * @see AbstractSymbolTable
+ * @see ConcreteSymbolList
  * @see SymbolTableInterface
  */
-public class SymbolTable implements SymbolTableInterface{
+public class SymbolTable implements SymbolTableInterface {
 
 	private static ArrayList<Class> table = null;
 	private static LinkedList<Object> stakeOfScope = null;
 
 	/**
 	 * Construtor que recebe uma lista de Class representada
-	 * por uma {@link AbstractSymbolTable}.
+	 * por uma {@link ConcreteSymbolList}.
 	 * 
 	 * &Eacute; gerada a Tabela de S&iacute;mbolos como um
 	 * ArrayList de Class para otimizar as buscas na tabela.
@@ -35,7 +35,7 @@ public class SymbolTable implements SymbolTableInterface{
 	 * sendo feita a an&aacute;lise neste momento.  
 	 * 
 	 * @param list Uma {@link LinkedList} de Class gerada pela
-	 * {@link AbstractSymbolTable}.
+	 * {@link ConcreteSymbolList}.
 	 */
 	public SymbolTable(LinkedList<Class> list) {
 		if(list != null) {

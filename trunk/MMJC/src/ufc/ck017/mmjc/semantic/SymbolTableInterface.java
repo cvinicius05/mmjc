@@ -14,7 +14,7 @@ import ufc.ck017.mmjc.symbolTable.TypeSymbol;
  * correto da fase de checagem de tipos.
  *  
  * @author Arthur Rodrigues
- * @see ufc.ck017.mmjc.symbolTable.AbstractSymbolTable
+ * @see ufc.ck017.mmjc.symbolTable.ConcreteSymbolList
  */
 public interface SymbolTableInterface {
 	

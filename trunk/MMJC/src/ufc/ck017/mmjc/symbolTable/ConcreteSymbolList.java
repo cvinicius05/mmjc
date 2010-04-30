@@ -8,6 +8,7 @@ import ufc.ck017.mmjc.node.ANonextNextclass;
 import ufc.ck017.mmjc.node.AProgram;
 import ufc.ck017.mmjc.node.PNextclass;
 import ufc.ck017.mmjc.node.PProgram;
+import ufc.ck017.mmjc.util.SemanticError;
 
 /**
  * Classe que representa a tabela de s&iacute;mbolos.
@@ -23,12 +24,12 @@ import ufc.ck017.mmjc.node.PProgram;
  * @author vinicius
  *
  */
-public class AbstractSymbolTable{
+public class ConcreteSymbolList {
 
 	private static LinkedList<Class> auxiliarTable; // Lista de classes que não extendem outras classes.
 	private static LinkedList<Class> extendedNotDefined;// Lista de classes que extedem classes não declaradas.
 	
-	public AbstractSymbolTable() {
+	public ConcreteSymbolList() {
 		auxiliarTable = new LinkedList<Class>();
 		extendedNotDefined = new LinkedList<Class>();
 	}
@@ -68,7 +69,7 @@ public class AbstractSymbolTable{
 
 			if(nextClass instanceof ANonextNextclass) {
 				auxiliarTable.add(newClass);
-				removeOfExtendedNotDefined(newClass);
+				removeFromExtendedNotDefined(newClass);
 			}
 
 			else if(nextClass instanceof AExtNextclass) {
@@ -81,7 +82,7 @@ public class AbstractSymbolTable{
 
 						if(auxClass.getName().equals(newClass.getParentClass())) {
 							auxClass.setExtendedList(newClass);
-							removeOfExtendedNotDefined(newClass);
+							removeFromExtendedNotDefined(newClass);
 							found = true;
 							break;
 						}
@@ -95,20 +96,22 @@ public class AbstractSymbolTable{
 				else extendedNotDefined.add(newClass);
 			}
 		}
+		
+		// TODO lançar o erro para a lista
 		if(!extendedNotDefined.isEmpty()) return null; // Existe uma classe cuja classe pai nao foi declarada.
 		return auxiliarTable;
 	}
 	
 	/**
-	 * M&eacute;todo que verifica se <i>NewClass</i> &eacute; uma classe
-	 * que extende a classe <i>aux</i>.
+	 * M&eacute;todo que verifica se <code>newClass</code> &eacute; uma classe
+	 * que extende a classe <code>aux</code>.
 	 * &Eacute; feita uma busca em profundidade nas extens&otilde;es das
 	 * classes. Se a classe pai &eacute; encontrada, alocamos a nova classe
 	 * &agrave; lista de classes extensoras da classe pai e removemos as
 	 * classes que extendem a nova classe e que estam na lista 
-	 * <i>extendedNotDefined</i>. 
+	 * <code>extendedNotDefined</code>. 
 	 * 
-	 * @param aux Classe a ser verificada como pai de <i>NewClass</i>. 
+	 * @param aux Classe a ser verificada como pai de <code>newClass</code>. 
 	 * @param newClass Nova classe a ser inserida como extensora de outra classe;
 	 * @return true se a classe pai &eacute; econtrada e false caso contr&aacute;rio.
 	 */
@@ -121,7 +124,7 @@ public class AbstractSymbolTable{
 				
 				if(aux2.getName().equals(newClass.getParentClass())) {
 					aux2.setExtendedList(newClass);
-					removeOfExtendedNotDefined(newClass);
+					removeFromExtendedNotDefined(newClass);
 					return true;
 				}
 				else if(setExtendedClass(aux2, newClass)) return true;
@@ -132,12 +135,12 @@ public class AbstractSymbolTable{
 	
 	/**
 	 * M&eacute;todo que remove as classes contidas em <i>extendedNotDefined</i>
-	 * cuja classe pai &eacute; <i>NewClass</i>. As classes removidas s&atilde;o
-	 * inseridas na lista de classes extensoras de <i>NewClass</i>.
+	 * cuja classe pai &eacute; <i>newClass</i>. As classes removidas s&atilde;o
+	 * inseridas na lista de classes extensoras de <i>newClass</i>.
 	 * 
 	 * @param newClass Classe rec&eacute;m adicionada a tabela de s&iacute;mbolos.
 	 */
-	private void removeOfExtendedNotDefined(Class newClass) {
+	private void removeFromExtendedNotDefined(Class newClass) {
 		if(!extendedNotDefined.isEmpty()) {
 
 			// Lista auxiliar de classes que extendem newClass e que estão em extendedNotDefined.
@@ -157,7 +160,7 @@ public class AbstractSymbolTable{
 				while(iter.hasNext()) extendedNotDefined.remove(iter.next());
 				
 				iter = newClass.getExtendedClass().iterator();
-				while(iter.hasNext()) removeOfExtendedNotDefined(iter.next());					
+				while(iter.hasNext()) removeFromExtendedNotDefined(iter.next());					
 			}
 		}
 	}

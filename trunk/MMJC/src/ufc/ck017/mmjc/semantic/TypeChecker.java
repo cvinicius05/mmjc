@@ -36,9 +36,9 @@ public class TypeChecker extends DepthFirstAdapter {
 	private SymbolTable table = null;
 	private ErrorLog errors = ErrorLog.getInstance();
 	private Stack<TypeSymbol> currclass = null;
-	private final TypeSymbol INTT = null; //TypeSymbol.getIntTSymbol();
-	private final TypeSymbol INTV = null; //TypeSymbol.getIntVSymbol();
-	private final TypeSymbol BOOL = null; //TypeSymbol.getBoolSymbol();
+	private final TypeSymbol INTT = TypeSymbol.getIntTSymbol();
+	private final TypeSymbol INTV = TypeSymbol.getIntVSymbol();
+	private final TypeSymbol BOOL = TypeSymbol.getBoolSymbol();
 	
 	public TypeChecker(SymbolTable symbols) {
 		table = symbols;

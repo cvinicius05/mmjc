@@ -11,6 +11,7 @@ import ufc.ck017.mmjc.node.AVar;
 import ufc.ck017.mmjc.node.PMethod;
 import ufc.ck017.mmjc.node.PNextclass;
 import ufc.ck017.mmjc.node.PVar;
+import ufc.ck017.mmjc.node.TId;
 
 /**
  * Classe que implementa a estrutura das classes declaradas no
@@ -28,8 +29,22 @@ public class Class {
 	private VarSymbol parentClass = null;
 	private ArrayList<Binding> localVariables = null;
 	private ArrayList<Method> methods = null;
-	private LinkedList<Class> extendedClass = null;
+	private LinkedList<Class> childrenClasses = null;
+	private boolean phantom = false;
 
+	public Class(Class parent, TId cname, int numVars, int numMethods) {
+		localVariables = new ArrayList<Binding>(numVars);
+		methods = new ArrayList<Method>(numMethods);
+		parentClass = (parent == null ? null : parent.getName());
+		name = VarSymbol.symbol(cname);
+	}
+	
+	public Class(Class parent, TId cname) {
+		phantom = true;
+		parentClass = (parent == null ? null : parent.getName());
+		name = VarSymbol.symbol(cname);
+	}
+	
 	public Class(PNextclass nextClass) {
 		if(nextClass instanceof ANonextNextclass) {
 
@@ -54,9 +69,17 @@ public class Class {
 			parentClass = VarSymbol.symbol(((AExtNextclass) nextClass).getExt());
 		}
 
-		extendedClass = new LinkedList<Class>();
+		childrenClasses = new LinkedList<Class>();
 		setLocalVariables(nextClass);
 		setMethods(nextClass);
+	}
+	
+	public void materialize(Class c) {
+		if(phantom) {
+			this.localVariables = c.localVariables;
+			this.methods = c.methods;
+			this.childrenClasses = c.childrenClasses;
+		}
 	}
 
 	/**
@@ -107,7 +130,7 @@ public class Class {
 	 * atual.
 	 */
 	public LinkedList<Class> getExtendedClass() {
-		return extendedClass;
+		return childrenClasses;
 	}
 
 	/**
@@ -117,7 +140,8 @@ public class Class {
 	 * @param c Classe que extende a classe atual.
 	 */
 	public void setExtendedList(Class c) {
-		extendedClass.add(c);
+		if(childrenClasses == null) childrenClasses = new LinkedList<Class>();
+		childrenClasses.add(c);
 	}
 
 	/**
