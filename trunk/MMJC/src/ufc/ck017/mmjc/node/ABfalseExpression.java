@@ -7,16 +7,26 @@ import ufc.ck017.mmjc.analysis.*;
 @SuppressWarnings("nls")
 public final class ABfalseExpression extends PExpression
 {
+    private TFalse _false_;
 
     public ABfalseExpression()
     {
         // Constructor
     }
 
+    public ABfalseExpression(
+        @SuppressWarnings("hiding") TFalse _false_)
+    {
+        // Constructor
+        setFalse(_false_);
+
+    }
+
     @Override
     public Object clone()
     {
-        return new ABfalseExpression();
+        return new ABfalseExpression(
+            cloneNode(this._false_));
     }
 
     public void apply(Switch sw)
@@ -24,16 +34,48 @@ public final class ABfalseExpression extends PExpression
         ((Analysis) sw).caseABfalseExpression(this);
     }
 
+    public TFalse getFalse()
+    {
+        return this._false_;
+    }
+
+    public void setFalse(TFalse node)
+    {
+        if(this._false_ != null)
+        {
+            this._false_.parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.parent() != null)
+            {
+                node.parent().removeChild(node);
+            }
+
+            node.parent(this);
+        }
+
+        this._false_ = node;
+    }
+
     @Override
     public String toString()
     {
-        return "";
+        return ""
+            + toString(this._false_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
+        if(this._false_ == child)
+        {
+            this._false_ = null;
+            return;
+        }
+
         throw new RuntimeException("Not a child.");
     }
 
@@ -41,6 +83,22 @@ public final class ABfalseExpression extends PExpression
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
+        if(this._false_ == oldChild)
+        {
+            setFalse((TFalse) newChild);
+            return;
+        }
+
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _false_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _false_.getPos();
+	}
 }

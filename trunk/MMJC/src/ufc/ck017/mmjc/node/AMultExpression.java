@@ -134,4 +134,14 @@ public final class AMultExpression extends PExpression
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _r_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _r_.getPos();
+	}
 }

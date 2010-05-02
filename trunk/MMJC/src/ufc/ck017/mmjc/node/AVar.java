@@ -134,4 +134,14 @@ public final class AVar extends PVar
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _type_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _type_.getPos();
+	}
 }

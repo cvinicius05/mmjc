@@ -184,4 +184,14 @@ public final class AMainclass extends PMainclass
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _cn_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _cn_.getPos();
+	}
 }

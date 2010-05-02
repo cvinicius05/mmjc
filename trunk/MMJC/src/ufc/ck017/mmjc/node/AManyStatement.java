@@ -98,4 +98,16 @@ public final class AManyStatement extends PStatement
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		PStatement stm = _statement_.peekFirst();
+		return (stm == null ? 0 : stm.getLine());
+	}
+
+	@Override
+	public int getPos() {
+		PStatement stm = _statement_.peekFirst();
+		return (stm == null ? 0 : stm.getPos());
+	}
 }
