@@ -141,4 +141,14 @@ public final class AProgram extends PProgram
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _mainclass_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _mainclass_.getPos();
+	}
 }

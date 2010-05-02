@@ -149,13 +149,9 @@ Productions
 
     type
         = {intt}  intt
-			{ -> New type.intt() }
         | {intv}  intv
-			{ -> New type.intv() }
         | {bool}  bool
-			{ -> New type.bool() }
-        | {class} id
-			{ -> New type.class(id) };
+        | {class} id;
 
 	noarrayexpr { -> expression }
         = {name}    id
@@ -163,11 +159,11 @@ Productions
 		| {literal} number
             { -> New expression.number(number) }
         | {true}    true
-            { -> New expression.btrue() }
+            { -> New expression.btrue(true) }
         | {false}   false
-            { -> New expression.bfalse() }
+            { -> New expression.bfalse(false) }
         | {self}    this
-            { -> New expression.self() }
+            { -> New expression.self(this) }
 		| {parexp}  lparen expr rparen
         	{ -> expr.expression }
         | {vaccess} noarrayexpr lbrace expr rbrace
@@ -272,12 +268,12 @@ Abstract Syntax Tree
         | {var}    id
         | {newobj} id
         | {number} number
-        | {btrue}
-        | {bfalse}
-        | {self} ;
-    
+        | {btrue}  true
+        | {bfalse} false
+        | {self}   this;
+
     type
-        = {intt}
-        | {intv}
-        | {bool}
+        = {intt}  intt
+        | {intv}  intv
+        | {bool}  bool
         | {class} id;

@@ -134,4 +134,14 @@ public final class AVectorExpression extends PExpression
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _l_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _l_.getPos();
+	}
 }

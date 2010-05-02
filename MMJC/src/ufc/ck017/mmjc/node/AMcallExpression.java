@@ -184,4 +184,14 @@ public final class AMcallExpression extends PExpression
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _obj_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _obj_.getPos();
+	}
 }

@@ -1313,8 +1313,10 @@ public class Parser
         PExpression pexpressionNode1;
         {
             // Block
+        TTrue ttrueNode2;
+        ttrueNode2 = (TTrue)nodeArrayList1.get(0);
 
-        pexpressionNode1 = new ABtrueExpression();
+        pexpressionNode1 = new ABtrueExpression(ttrueNode2);
         }
 	nodeList.add(pexpressionNode1);
         return nodeList;
@@ -1331,8 +1333,10 @@ public class Parser
         PExpression pexpressionNode1;
         {
             // Block
+        TFalse tfalseNode2;
+        tfalseNode2 = (TFalse)nodeArrayList1.get(0);
 
-        pexpressionNode1 = new ABfalseExpression();
+        pexpressionNode1 = new ABfalseExpression(tfalseNode2);
         }
 	nodeList.add(pexpressionNode1);
         return nodeList;
@@ -1349,8 +1353,10 @@ public class Parser
         PExpression pexpressionNode1;
         {
             // Block
+        TThis tthisNode2;
+        tthisNode2 = (TThis)nodeArrayList1.get(0);
 
-        pexpressionNode1 = new ASelfExpression();
+        pexpressionNode1 = new ASelfExpression(tthisNode2);
         }
 	nodeList.add(pexpressionNode1);
         return nodeList;
