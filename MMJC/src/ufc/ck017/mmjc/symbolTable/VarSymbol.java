@@ -29,15 +29,11 @@ public class VarSymbol {
 	private static Dictionary<String, VarSymbol> varDict = new Hashtable<String, VarSymbol>();
 	
 	private VarSymbol(String var) {
-		nameVar = var;
+		nameVar = var.intern();
 	}
 
 	public String toString() {
 		return nameVar;
-	}
-	
-	public Dictionary<String, VarSymbol> getDictonary() {
-		return varDict;
 	}
 
 	/**
@@ -49,12 +45,8 @@ public class VarSymbol {
 	 */
 	public static VarSymbol symbolFromString(String nameVar) {
 		String u = nameVar.intern();
-	    VarSymbol s = (VarSymbol)varDict.get(u);
-	   
-	    if(s == null) {
-	    	s = new VarSymbol(u);
-	    	varDict.put(u,s);
-	    }
+	    VarSymbol s = varDict.get(u);
+	    
 	    return s;
 	}
 
@@ -68,12 +60,17 @@ public class VarSymbol {
 	public static VarSymbol symbol(TId id) {
 		String str = id.getText();
 	    String u = str.intern();
-	    VarSymbol s = (VarSymbol)varDict.get(u);
+	    VarSymbol s = varDict.get(u);
 	   
 	    if(s == null) {
 	    	s = new VarSymbol(u);
 	    	varDict.put(u,s);
 	    }
 	    return s;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof VarSymbol) && (((VarSymbol)obj).hashCode() == this.hashCode());
 	}
 }

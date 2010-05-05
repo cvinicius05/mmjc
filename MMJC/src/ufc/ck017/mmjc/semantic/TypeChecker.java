@@ -31,17 +31,12 @@ import ufc.ck017.mmjc.util.SemanticError;
  * @see SymbolTable
  */
 public class TypeChecker extends DepthFirstAdapter {
-	private SymbolTable table = null;
+	private SymbolTable table = SymbolTable.getInstance();
 	private ErrorLog errors = ErrorLog.getInstance();
-	private Stack<TypeSymbol> currclass = null;
+	private Stack<TypeSymbol> currclass = new Stack<TypeSymbol>();
 	private final TypeSymbol INTT = TypeSymbol.getIntTSymbol();
 	private final TypeSymbol INTV = TypeSymbol.getIntVSymbol();
 	private final TypeSymbol BOOL = TypeSymbol.getBoolSymbol();
-	
-	public TypeChecker(SymbolTable symbols) {
-		table = symbols;
-		currclass = new Stack<TypeSymbol>();
-	}
 	
 	private boolean checkExprType(PExpression expression, TypeSymbol type) {
 		TypeSymbol exst = expression.getType();
@@ -56,7 +51,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void inAExtNextclass(AExtNextclass node) {
 		table.enterScope(node.getName());
-		currclass.push(TypeSymbol.symbolOfID(node.getName()));
+		currclass.push(TypeSymbol.getFromString(node.getName().getText()));
 	}
 	
 	@Override
@@ -68,7 +63,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void inANonextNextclass(ANonextNextclass node) {
 		table.enterScope(node.getId());
-		currclass.push(TypeSymbol.symbolOfID((node.getId())));
+		currclass.push(TypeSymbol.getFromString(node.getId().getText()));
 	}
 	
 	@Override
@@ -277,7 +272,7 @@ public class TypeChecker extends DepthFirstAdapter {
 			errors.addError(SemanticError.classNotFound(node.getId()));
 			node.setType(null);
 		} else
-			node.setType(TypeSymbol.symbolOfID((node.getId())));
+			node.setType(TypeSymbol.getFromString(node.getId().getText()));
 	}
 	
 	@Override
