@@ -1,12 +1,11 @@
 package ufc.ck017.mmjc.symbolTable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Hashtable;
 
-import ufc.ck017.mmjc.node.AMethod;
 import ufc.ck017.mmjc.node.AVar;
 import ufc.ck017.mmjc.node.PMethod;
-import ufc.ck017.mmjc.node.PVar;
+import ufc.ck017.mmjc.node.PType;
 import ufc.ck017.mmjc.node.TId;
 
 /**
@@ -19,29 +18,22 @@ import ufc.ck017.mmjc.node.TId;
  * @author vinicius
  *
  */
-public class Method {
+public class Method extends ScopeEntry {
 
 	private VarSymbol name = null;
 	private TypeSymbol typeOfReturn = null;
-	private VarSymbol nameOfClass = null;
+	private Class superclass = null;
 	private ArrayList<Binding> parameters = null;
-	private ArrayList<Binding> localVariables = null;
+	private Hashtable<VarSymbol, TypeSymbol> localVariables = null;
 
-	public Method(PMethod method, VarSymbol nameOfClass) {
-		int numberOfParameters = ((AMethod) method).getParam().size();
-		parameters = new ArrayList<Binding>(numberOfParameters);
-
-		int numberOfVariables = ((AMethod) method).getLocal().size();
-		localVariables = new ArrayList<Binding>(numberOfVariables);
-
-		name = VarSymbol.symbol(((AMethod) method).getId());
-		typeOfReturn = TypeSymbol.symbol(((AMethod) method).getType());
-		this.nameOfClass = nameOfClass;
-		
-		setLocalVariables(method);
-		setParameters(method);
+	public Method(TId name, Class pclass, PType type, int numParam, int numLocal) {
+		this.name = VarSymbol.symbol(name);
+		typeOfReturn = TypeSymbol.symbol(type);
+		superclass = pclass;
+		parameters = new ArrayList<Binding>(numParam);
+		localVariables = new Hashtable<VarSymbol, TypeSymbol>(numLocal);
 	}
-
+	
 	/**
 	 * Retorna o nome do m&eacute;todo representado por
 	 * um s&iacute;mbolo do tipo {@link VarSymbol}.
@@ -70,8 +62,8 @@ public class Method {
 	 * @return {@link VarSymbol} representando o nome da classe
 	 * ao qual o m&eacute;todo pertence.
 	 */
-	public VarSymbol getNameOfClass() {
-		return nameOfClass;
+	public Class getNameOfClass() {
+		return superclass;
 	}
 
 	/**
@@ -96,7 +88,7 @@ public class Method {
 	 * @return  vari&aacute;veis locais na forma de um
 	 * ArrayList de {@link Binding}.
 	 */
-	public ArrayList<Binding> getLocalVariables() {
+	public Hashtable<VarSymbol, TypeSymbol> getLocalVariables() {
 		return localVariables;
 	}
 
@@ -107,24 +99,13 @@ public class Method {
 	 * 
 	 * @param method produ&ccedil;&atilde;o do tipo {@link PMethod}.
 	 */
-	private void setParameters(PMethod method) {
-		PVar var = null;
-		Iterator<PVar> iter = ((AMethod) method).getParam().iterator();
-		int index;
+	public boolean addParamater(AVar var) {
+		Binding b = new Binding(VarSymbol.symbol(var.getId()), TypeSymbol.symbol(var.getType()));
 
-		while(iter.hasNext()) {
-			var = iter.next();
-
-			VarSymbol v = VarSymbol.symbol(((AVar) var).getId());
-			TypeSymbol t = TypeSymbol.symbol(((AVar) var).getType());
-			Binding b = new Binding(v, t);
-
-			index = v.hashCode() % parameters.size();
-			if(index < 0) index = -index;
-
-			while(parameters.get(index) != null) index = (index+1) % parameters.size();
-			parameters.add(index, b);
-		}
+		if(parameters.contains(b)) return false;
+		
+		parameters.add(b);
+		return true;
 	}
 
 	/**
@@ -134,24 +115,13 @@ public class Method {
 	 * 
 	 * @param method produ&ccedil;&atilde;o do tipo {@link PMethod}.
 	 */
-	private void setLocalVariables(PMethod method) {
-		PVar var = null;
-		Iterator<PVar> iter = ((AMethod) method).getLocal().iterator();
-		int index;
+	public boolean addLocalVar(AVar var) {
+		VarSymbol v = VarSymbol.symbol(var.getId());
 
-		while(iter.hasNext()) {
-			var = iter.next();
-
-			VarSymbol v = VarSymbol.symbol(((AVar) var).getId());
-			TypeSymbol t = TypeSymbol.symbol(((AVar) var).getType());
-			Binding b = new Binding(v, t);
-
-			index = v.hashCode() % localVariables.size();
-			if(index < 0) index = -index;
-
-			while(localVariables.get(index) != null) index = (index+1) % localVariables.size();
-			localVariables.add(index, b);
-		}
+		if(localVariables.get(v) != null) return false;
+		
+		localVariables.put(v, TypeSymbol.symbol(var.getType()));
+		return true;
 	}
 
 	/**
@@ -164,21 +134,12 @@ public class Method {
 	 * encontrado, e null caso contr&aacute;rio.
 	 */
 	public TypeSymbol getTypeOfParameter(TId id) {
-		VarSymbol nameOfId = VarSymbol.symbol(id);
-
-		int index = nameOfId.hashCode() % parameters.size();
-		if(index < 0) index = -index;
-
-		if(parameters.get(index).getVarSymbol().equals(nameOfId))
-			return parameters.get(index).getTypeSymbol();
-
-		int marker = index;
-		do {
-			index = (index+1) % parameters.size();
+		VarSymbol temp = VarSymbol.symbol(id);
+		
+		for(Binding b : parameters) {
+			if(b.getVarSymbol().equals(temp)) return b.getTypeSymbol();
 		}
-		while(!parameters.get(index).getVarSymbol().equals(nameOfId) && marker != index);
-
-		if(marker != index) return parameters.get(index).getTypeSymbol();
+		
 		return null;
 	}
 
@@ -192,21 +153,16 @@ public class Method {
 	 * encontrado, e null caso contr&aacute;rio.
 	 */
 	public TypeSymbol getTypeOfLocalVariable(TId id) {
-		VarSymbol v = VarSymbol.symbol(id);
+		return localVariables.get(VarSymbol.symbol(id));
+	}
 
-		int index = v.hashCode() % localVariables.size();
-		if(index < 0) index = -index;
+	@Override
+	public Class getParent() {
+		return superclass;
+	}
 
-		if(localVariables.get(index).getVarSymbol().equals(v))
-			return localVariables.get(index).getTypeSymbol();
-
-		int marker = index;
-		do {
-			index = (index+1) % localVariables.size();
-		}
-		while(!localVariables.get(index).getVarSymbol().equals(v) && index != marker);
-
-		if(marker != index) return localVariables.get(index).getTypeSymbol();
-		return null;
+	@Override
+	public ScopeEntry getSuperScope() {
+		return superclass;
 	}
 }

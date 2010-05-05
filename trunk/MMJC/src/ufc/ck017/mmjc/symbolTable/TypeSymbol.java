@@ -33,15 +33,16 @@ public class TypeSymbol {
 	private static Dictionary<String, TypeSymbol> typeDict = new Hashtable<String, TypeSymbol>();
 	
 	private TypeSymbol(String type) {
-		typeName = type;
+		typeName = type.intern();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof TypeSymbol) && (((TypeSymbol)obj).typeName.hashCode() == this.typeName.hashCode());
 	}
 	
 	public String toString() {
 		return typeName;
-	}
-	
-	public Dictionary<String, TypeSymbol> getDictonary() {
-		return typeDict;
 	}
 	
 	/**
@@ -90,8 +91,16 @@ public class TypeSymbol {
 		else if(ptype instanceof AIntvType) s = "int[]";
 		else if(ptype instanceof ABoolType) s = "boolean";
 		else if(ptype instanceof AClassType) s = ((AClassType) ptype).getId().getText();
+		
+		s = s.intern();
+		TypeSymbol symbol = typeDict.get(s);
+		
+		if(symbol == null) {
+			symbol = new TypeSymbol(s);
+			typeDict.put(s,symbol);
+		}
 
-		return TypeSymbol.getFromString(s);
+		return symbol;
 	}
 	
 	/**
@@ -114,14 +123,10 @@ public class TypeSymbol {
 	 * @param typeName representa string de tipo a ser traduzida. 
 	 * @return novo s&iacute;mbolo associado a string de entrada.
 	 */
-	private static TypeSymbol getFromString(String typeName){
+	public static TypeSymbol getFromString(String typeName){
 		String u = typeName.intern();
-		TypeSymbol symbol = (TypeSymbol)typeDict.get(u);
+		TypeSymbol symbol = typeDict.get(u);
 		
-		if(symbol == null) {
-			symbol = new TypeSymbol(u);
-			typeDict.put(u,symbol);
-		}
 		return symbol;
 	}
 }

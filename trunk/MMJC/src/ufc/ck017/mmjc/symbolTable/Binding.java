@@ -17,7 +17,7 @@ public class Binding {
 		this.type = type;
 		this.var = var;
 	}
-
+	
 	public void setVarSymbol(VarSymbol var) {
 		this.var = var;
 	}
@@ -32,5 +32,10 @@ public class Binding {
 
 	public TypeSymbol getTypeSymbol() {
 		return type;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Binding) && this.var.equals(((Binding)obj).var);
 	}
 }
