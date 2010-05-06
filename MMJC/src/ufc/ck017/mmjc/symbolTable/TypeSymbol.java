@@ -52,7 +52,7 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado a string <b>int</b>.
 	 */
 	public static TypeSymbol getIntTSymbol() {
-		return TypeSymbol.getFromString("int");
+		return TypeSymbol.symbol("int");
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado a string <b>int[]</b>.
 	 */
 	public static TypeSymbol getIntVSymbol() {
-		return TypeSymbol.getFromString("int[]");
+		return TypeSymbol.symbol("int[]");
 	}
 	
 	/**
@@ -72,7 +72,7 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado a string <b>boolean</b>.
 	 */
 	public static TypeSymbol getBoolSymbol() {
-		return TypeSymbol.getFromString("boolean");
+		return TypeSymbol.symbol("boolean");
 	}
 	
 	/**
@@ -103,6 +103,18 @@ public class TypeSymbol {
 		return symbol;
 	}
 	
+	public static TypeSymbol symbol(String s) {
+		s = s.intern();
+		TypeSymbol symbol = typeDict.get(s);
+		
+		if(symbol == null) {
+			symbol = new TypeSymbol(s);
+			typeDict.put(s,symbol);
+		}
+
+		return symbol;
+	}
+	
 	/**
 	 * M&eacute;todo que cria e armazena no dicion&aacute;rio 
 	 * um s&iacute;mbolo associado a um token do tipo 
@@ -112,8 +124,8 @@ public class TypeSymbol {
 	 * @param id representa o token do tipo <b>TId</b>.
 	 * @return novo s&iacute;mbolo associado ao tipo de <b>TId</b>.
 	 */
-	public static TypeSymbol symbolOfID(TId id) {
-		return TypeSymbol.getFromString(id.getText());
+	public static TypeSymbol search(TId id) {
+		return TypeSymbol.search(id.getText());
 	}
 	
 	/**
@@ -123,7 +135,7 @@ public class TypeSymbol {
 	 * @param typeName representa string de tipo a ser traduzida. 
 	 * @return novo s&iacute;mbolo associado a string de entrada.
 	 */
-	public static TypeSymbol getFromString(String typeName){
+	public static TypeSymbol search(String typeName){
 		String u = typeName.intern();
 		TypeSymbol symbol = typeDict.get(u);
 		

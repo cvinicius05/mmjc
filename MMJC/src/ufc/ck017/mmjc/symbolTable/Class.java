@@ -31,7 +31,7 @@ public class Class extends ScopeEntry {
 		localVariables = new Hashtable<VarSymbol, TypeSymbol>(numVars);
 		methods = new Hashtable<VarSymbol, Method>(numMethods);
 		parent = pclass;
-		name = TypeSymbol.symbolOfID(cname);
+		name = TypeSymbol.symbol(cname.getText());
 	}
 	
 	public Class(Class pclass, TypeSymbol cname) {

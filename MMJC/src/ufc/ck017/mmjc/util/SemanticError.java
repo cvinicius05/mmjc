@@ -41,11 +41,11 @@ public class SemanticError {
 	}
 
 	public static String invalidAtbToObject(TId idst, TypeSymbol classtype) {
-		return err+idst.getLine()+','+idst.getPos()+"]:\n\tIdentifier has type <"+TypeSymbol.symbolOfID(idst)+"> but was assigned an incompatible value of type <"+classtype+">.";
+		return err+idst.getLine()+','+idst.getPos()+"]:\n\tIdentifier has type <"+TypeSymbol.search(idst)+"> but was assigned an incompatible value of type <"+classtype+">.";
 	}
 
 	public static String incompatibleClassAtb(TId idst, TypeSymbol classtype) {
-		return err+idst.getLine()+','+idst.getPos()+"]:\n\tThe class <"+TypeSymbol.symbolOfID(idst)+"> is not a superclass of the <"+classtype+"> class.";
+		return err+idst.getLine()+','+idst.getPos()+"]:\n\tThe class <"+TypeSymbol.search(idst)+"> is not a superclass of the <"+classtype+"> class.";
 	}
 
 	public static String objectExpected(PExpression object) {

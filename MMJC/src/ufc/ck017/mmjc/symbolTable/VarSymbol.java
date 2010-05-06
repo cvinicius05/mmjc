@@ -43,7 +43,7 @@ public class VarSymbol {
 	 * @param nameVar nome da vari&aacute;vel.
 	 * @return novo s&iacute;mbolo associado ao nome da vari&aacute;vel encontrada.
 	 */
-	public static VarSymbol symbolFromString(String nameVar) {
+	public static VarSymbol search(String nameVar) {
 		String u = nameVar.intern();
 	    VarSymbol s = varDict.get(u);
 	    
