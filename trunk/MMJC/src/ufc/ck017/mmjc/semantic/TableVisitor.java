@@ -65,7 +65,7 @@ public class TableVisitor extends DepthFirstAdapter {
 	@Override
 	public void inAExtNextclass(AExtNextclass node) {
 		Class newclass = null, pclass = null;
-		TypeSymbol psymbol = TypeSymbol.symbolOfID(node.getExt());
+		TypeSymbol psymbol = TypeSymbol.search(node.getExt());
 		int numVars = 0, numMethods = 0;
 	
 		numVars = node.getVar().size();

@@ -1,5 +1,6 @@
 package ufc.ck017.mmjc.symbolTable;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -60,17 +61,15 @@ public class SymbolTable implements SymbolTableInterface {
 	
 	@Override
 	public void enterScope(TId id) {
-		VarSymbol nameOfId = VarSymbol.symbolFromString(id.getText());
-		
 		if(currentScope == null)
-			currentScope = symboltable.get(nameOfId);
+			currentScope = symboltable.get(TypeSymbol.search(id.getText()));
 		else
-			currentScope = ((Class)currentScope).getMethod(nameOfId);
+			currentScope = ((Class)currentScope).getMethod(VarSymbol.search(id.getText()));
 	}
 
 	@Override
 	public void exitScope() {
-		if(currentScope != null) currentScope.getParent();
+		if(currentScope != null) currentScope = currentScope.getSuperScope();
 	}
 
 	@Override
@@ -95,7 +94,7 @@ public class SymbolTable implements SymbolTableInterface {
 
 	@Override
 	public boolean isClass(TId cname) {
-		return isClass(TypeSymbol.getFromString(cname.getText()));
+		return cname != null && isClass(TypeSymbol.search(cname.getText()));
 	}
 
 	@Override
@@ -127,15 +126,16 @@ public class SymbolTable implements SymbolTableInterface {
 	@Override
 	public boolean isMethod(TypeSymbol obj, TId mname, List<TypeSymbol> params) {
 		Method m = getMethod(obj, mname);
+		int index = 0;
 		
 		if(m == null || m.getParameters().size() != params.size()) return false;
+		ArrayList<Binding> actualparams = m.getParameters();
 		
-		Iterator<Binding> actualparams = m.getParameters().iterator();
-		Iterator<TypeSymbol> searchparams = params.iterator();
-		
-		while(actualparams.hasNext()) {
-			TypeSymbol type = actualparams.next().getTypeSymbol();
-			if(!type.equals(searchparams.next())) return false;
+		for(TypeSymbol ts : params) {
+			TypeSymbol type = actualparams.get(index).getTypeSymbol();
+			if(ts == null || (isClass(type) && isClass(ts) && !isSubclassOf(type, ts)) || !ts.equals(type))
+				return false;
+			index++;
 		}
 		
 		return true;
@@ -144,7 +144,7 @@ public class SymbolTable implements SymbolTableInterface {
 	private Method getMethod(TypeSymbol ctype, TId mid) {
 		Method m;
 		Class c = symboltable.get(ctype);
-		VarSymbol msymbol = VarSymbol.symbolFromString(mid.getText());
+		VarSymbol msymbol = VarSymbol.search(mid.getText());
 		
 		while(c != null) {
 			if((m = c.getMethod(msymbol)) != null)
@@ -159,7 +159,7 @@ public class SymbolTable implements SymbolTableInterface {
 	private TypeSymbol getVar(TId id) {
 		if(currentScope == null) return null;
 		
-		VarSymbol var = VarSymbol.symbolFromString(id.getText());
+		VarSymbol var = VarSymbol.search(id.getText());
 		TypeSymbol type = null;
 		Method m;
 		Class c;
