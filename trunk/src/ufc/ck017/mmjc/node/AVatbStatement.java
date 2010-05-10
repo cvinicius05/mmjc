@@ -177,4 +177,14 @@ public final class AVatbStatement extends PStatement
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _i_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _i_.getPos();
+	}
 }

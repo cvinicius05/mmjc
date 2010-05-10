@@ -91,4 +91,14 @@ public final class AInttType extends PType
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _intt_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _intt_.getPos();
+	}
 }

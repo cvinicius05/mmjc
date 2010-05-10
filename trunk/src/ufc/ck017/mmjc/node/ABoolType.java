@@ -91,4 +91,14 @@ public final class ABoolType extends PType
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _bool_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _bool_.getPos();
+	}
 }

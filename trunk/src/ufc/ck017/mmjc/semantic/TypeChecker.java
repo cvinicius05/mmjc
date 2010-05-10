@@ -1,7 +1,6 @@
 package ufc.ck017.mmjc.semantic;
 
 import java.util.LinkedList;
-import java.util.Stack;
 
 import ufc.ck017.mmjc.analysis.DepthFirstAdapter;
 import ufc.ck017.mmjc.node.*;
@@ -9,8 +8,6 @@ import ufc.ck017.mmjc.symbolTable.SymbolTable;
 import ufc.ck017.mmjc.symbolTable.TypeSymbol;
 import ufc.ck017.mmjc.util.ErrorLog;
 import ufc.ck017.mmjc.util.SemanticError;
-
-// TODO informar os erros pertinentes
 
 /**
  * Esta classe implementa o <code>Visitor</code> respons&aacute;vel pela
@@ -26,57 +23,51 @@ import ufc.ck017.mmjc.util.SemanticError;
  * Outro conjunto de n&oacute;s cuja visita se faz necess&aacute;ria, mas
  * neste caso devido &agrave; nossa implementa&ccedil;&atilde;o da Tabela de
  * S&iacute;mbolos, s&atilde;o os de declara&ccedil;&atilde;o de classes
- * e m&eacute;todos. Nesses n&oacute;s apenas informamos a Tabela que o
+ * e m&eacute;todos. Nesses n&oacute;s apenas informamos &agrave; Tabela que o
  * escopo atual mudou.
  * 
  * @author Arthur Rodrigues
  * @see SymbolTable
  */
 public class TypeChecker extends DepthFirstAdapter {
-	private SymbolTable table = null;
+	private SymbolTable table = SymbolTable.getInstance();
 	private ErrorLog errors = ErrorLog.getInstance();
-	private Stack<TypeSymbol> currclass = null;
-	private final TypeSymbol INTT = null; //TypeSymbol.getIntTSymbol();
-	private final TypeSymbol INTV = null; //TypeSymbol.getIntVSymbol();
-	private final TypeSymbol BOOL = null; //TypeSymbol.getBoolSymbol();
-	
-	public TypeChecker(SymbolTable symbols) {
-		table = symbols;
-		currclass = new Stack<TypeSymbol>();
-	}
+	private TypeSymbol currclass = null;
+	private final TypeSymbol INTT = TypeSymbol.getIntTSymbol();
+	private final TypeSymbol INTV = TypeSymbol.getIntVSymbol();
+	private final TypeSymbol BOOL = TypeSymbol.getBoolSymbol();
 	
 	private boolean checkExprType(PExpression expression, TypeSymbol type) {
 		TypeSymbol exst = expression.getType();
 		
-		if(exst != type) {
+		if(exst == null || !exst.equals(type)) {
 			errors.addError(SemanticError.expectedExprType(expression, type, exst));
-			return true;
-		} else 
 			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override
 	public void inAExtNextclass(AExtNextclass node) {
 		table.enterScope(node.getName());
-		currclass.push(TypeSymbol.symbolOfID(node.getName()));
+		currclass = TypeSymbol.search(node.getName().getText());
 	}
 	
 	@Override
 	public void outAExtNextclass(AExtNextclass node) {
 		table.exitScope();
-		currclass.pop();
 	}
 	
 	@Override
 	public void inANonextNextclass(ANonextNextclass node) {
 		table.enterScope(node.getId());
-		currclass.push(TypeSymbol.symbolOfID((node.getId())));
+		currclass = TypeSymbol.search(node.getId().getText());
 	}
 	
 	@Override
 	public void outANonextNextclass(ANonextNextclass node) {
 		table.exitScope();
-		currclass.pop();
 	}
 	
 	@Override
@@ -84,8 +75,25 @@ public class TypeChecker extends DepthFirstAdapter {
 		table.enterScope(node.getId());
 	}
 	
+	/*@Override
+	public void outAMethod(AMethod node) {
+		TypeSymbol rmtype = TypeSymbol.search(node.getType());
+		TypeSymbol retype = node.getExpression().getType();
+		
+		if(!table.isSubclassOf(rmtype, retype))
+			errors.addError(SemanticError.invalidReturnType(node.getId(), rmtype, retype));
+		
+		table.exitScope();
+	}*/
+
 	@Override
 	public void outAMethod(AMethod node) {
+		TypeSymbol rmtype = TypeSymbol.search(node.getType());
+		TypeSymbol retype = node.getExpression().getType();
+		
+		if(!rmtype.equals(retype) && !table.isSubclassOf(rmtype, retype))
+			errors.addError(SemanticError.invalidReturnType(node.getId(), rmtype, retype));
+		
 		table.exitScope();
 	}
 	
@@ -106,7 +114,7 @@ public class TypeChecker extends DepthFirstAdapter {
 				errors.addError(SemanticError.invalidAtbToObject(identifier, classtype));
 			else if(!table.isSubclassOf(idst, classtype))
 				errors.addError(SemanticError.incompatibleClassAtb(identifier, classtype));
-		} else if(!table.isVar(identifier) || idst != exst || exst == null) {
+		} else if(!table.isVar(identifier) || exst == null || !idst.equals(exst)) {
 			errors.addError(SemanticError.invalidAtb(node));
 		}
 	}
@@ -132,27 +140,21 @@ public class TypeChecker extends DepthFirstAdapter {
 	public void outAWhileStatement(AWhileStatement node) {
 		PExpression expression = node.getExpression();
 		
-		if(!checkExprType(expression, BOOL)) {
-			//errors.addError(SemanticError.invalidTypePrint(expression));
-		}
+		checkExprType(expression, BOOL);
 	}
 	
 	@Override
 	public void outAIfStatement(AIfStatement node) {
 		PExpression expression = node.getExpression();
 		
-		if(!checkExprType(expression, BOOL)) {
-			//errors.addError(SemanticError.invalidTypePrint(expression));
-		}
+		checkExprType(expression, BOOL);
 	}
 	
 	@Override
 	public void outAPrintStatement(APrintStatement node) {
 		PExpression expression = node.getExpression();
 		
-		if(!checkExprType(expression, INTT))  {
-			errors.addError(SemanticError.invalidTypePrint(expression));
-		}
+		checkExprType(expression, INTT);
 	}
 	
 	@Override
@@ -170,7 +172,7 @@ public class TypeChecker extends DepthFirstAdapter {
 			errors.addError(SemanticError.objectExpected(object));
 			node.setType(null);
 		} else if(!table.isMethod(objtype, mname, paramtypes)) {
-			errors.addError(SemanticError.methodExpected(objtype, mname)); // TODO dar o erro correto
+			errors.addError(SemanticError.methodExpected(objtype, mname));
 			node.setType(null);
 		} else {
 			node.setType(table.getType(object.getType(), mname));
@@ -180,7 +182,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outAPlusExpression(APlusExpression node) {
 		if(node.getL().getType() != INTT || node.getR().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+			errors.addError(SemanticError.invalidOperationExpr(node.getL(), node.getR(), INTT));
 			node.setType(null);
 		} else
 			node.setType(INTT);
@@ -189,7 +191,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outAMinusExpression(AMinusExpression node) {
 		if(node.getL().getType() != INTT || node.getR().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+			errors.addError(SemanticError.invalidOperationExpr(node.getL(), node.getR(), INTT));
 			node.setType(null);
 		} else
 			node.setType(INTT);
@@ -198,7 +200,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outAMultExpression(AMultExpression node) {
 		if(node.getL().getType() != INTT || node.getR().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+			errors.addError(SemanticError.invalidOperationExpr(node.getL(), node.getR(), INTT));
 			node.setType(null);
 		} else
 			node.setType(INTT);
@@ -207,7 +209,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outAGthanExpression(AGthanExpression node) {
 		if(node.getL().getType() != INTT || node.getR().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+			errors.addError(SemanticError.invalidOperationExpr(node.getL(), node.getR(), INTT));
 			node.setType(null);
 		} else
 			node.setType(BOOL);
@@ -216,7 +218,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outALthanExpression(ALthanExpression node) {
 		if(node.getL().getType() != INTT || node.getR().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+			errors.addError(SemanticError.invalidOperationExpr(node.getL(), node.getR(), INTT));
 			node.setType(null);
 		} else
 			node.setType(BOOL);
@@ -225,7 +227,7 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outAAndExpression(AAndExpression node) {
 		if(node.getL().getType() != BOOL || node.getR().getType() != BOOL) {
-			//errors.addError(SemanticError.objectExpected(object));
+			errors.addError(SemanticError.invalidOperationExpr(node.getL(), node.getR(), BOOL));
 			node.setType(null);
 		} else
 			node.setType(BOOL);
@@ -233,37 +235,38 @@ public class TypeChecker extends DepthFirstAdapter {
 	
 	@Override
 	public void outAVectorExpression(AVectorExpression node) {
-		if(node.getL().getType() != INTV || node.getI().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+		if(node.getL().getType() == INTV) { 
+			if(node.getI().getType() == INTT)
+				node.setType(INTT);
+			else
+				errors.addError(SemanticError.invalidVAcess(node.getI(), false));
+		} else {
+			errors.addError(SemanticError.invalidVAcess(node.getL(), true));
 			node.setType(null);
-		} else
-			node.setType(INTT);
+		}
 	}
 	
 	@Override
 	public void outALengthExpression(ALengthExpression node) {
-		if(node.getExpression().getType() != INTV) {
-			//errors.addError(SemanticError.objectExpected(object));
+		if(!checkExprType(node.getExpression(), INTV))
 			node.setType(null);
-		} else
+		else
 			node.setType(INTT);
 	}
 	
 	@Override
 	public void outANotExpression(ANotExpression node) {
-		if(node.getExpression().getType() != BOOL) {
-			//errors.addError(SemanticError.objectExpected(object));
+		if(!checkExprType(node.getExpression(), BOOL))
 			node.setType(null);
-		} else
+		else
 			node.setType(BOOL);
 	}
 	
 	@Override
 	public void outANewvecExpression(ANewvecExpression node) {
-		if(node.getExpression().getType() != INTT) {
-			//errors.addError(SemanticError.objectExpected(object));
+		if(!checkExprType(node.getExpression(), INTT))
 			node.setType(null);
-		} else
+		else
 			node.setType(INTV);
 	}
 	
@@ -281,10 +284,10 @@ public class TypeChecker extends DepthFirstAdapter {
 	@Override
 	public void outANewobjExpression(ANewobjExpression node) {
 		if(!table.isClass(node.getId())) {
-			//errors.addError(SemanticError.idNotFound(node.getId()));
+			errors.addError(SemanticError.classNotFound(node.getId()));
 			node.setType(null);
 		} else
-			node.setType(TypeSymbol.symbolOfID((node.getId())));
+			node.setType(TypeSymbol.search(node.getId().getText()));
 	}
 	
 	@Override
@@ -304,6 +307,6 @@ public class TypeChecker extends DepthFirstAdapter {
 	
 	@Override
 	public void outASelfExpression(ASelfExpression node) {
-		node.setType(currclass.peek());
+		node.setType(currclass);
 	}
 }

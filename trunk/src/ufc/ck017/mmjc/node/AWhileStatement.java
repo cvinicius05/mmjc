@@ -134,4 +134,14 @@ public final class AWhileStatement extends PStatement
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _expression_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _expression_.getPos();
+	}
 }

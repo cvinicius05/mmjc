@@ -91,4 +91,14 @@ public final class AIntvType extends PType
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _intv_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _intv_.getPos();
+	}
 }

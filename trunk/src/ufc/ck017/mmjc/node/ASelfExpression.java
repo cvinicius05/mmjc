@@ -7,16 +7,26 @@ import ufc.ck017.mmjc.analysis.*;
 @SuppressWarnings("nls")
 public final class ASelfExpression extends PExpression
 {
+    private TThis _this_;
 
     public ASelfExpression()
     {
         // Constructor
     }
 
+    public ASelfExpression(
+        @SuppressWarnings("hiding") TThis _this_)
+    {
+        // Constructor
+        setThis(_this_);
+
+    }
+
     @Override
     public Object clone()
     {
-        return new ASelfExpression();
+        return new ASelfExpression(
+            cloneNode(this._this_));
     }
 
     public void apply(Switch sw)
@@ -24,16 +34,48 @@ public final class ASelfExpression extends PExpression
         ((Analysis) sw).caseASelfExpression(this);
     }
 
+    public TThis getThis()
+    {
+        return this._this_;
+    }
+
+    public void setThis(TThis node)
+    {
+        if(this._this_ != null)
+        {
+            this._this_.parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.parent() != null)
+            {
+                node.parent().removeChild(node);
+            }
+
+            node.parent(this);
+        }
+
+        this._this_ = node;
+    }
+
     @Override
     public String toString()
     {
-        return "";
+        return ""
+            + toString(this._this_);
     }
 
     @Override
     void removeChild(@SuppressWarnings("unused") Node child)
     {
         // Remove child
+        if(this._this_ == child)
+        {
+            this._this_ = null;
+            return;
+        }
+
         throw new RuntimeException("Not a child.");
     }
 
@@ -41,6 +83,22 @@ public final class ASelfExpression extends PExpression
     void replaceChild(@SuppressWarnings("unused") Node oldChild, @SuppressWarnings("unused") Node newChild)
     {
         // Replace child
+        if(this._this_ == oldChild)
+        {
+            setThis((TThis) newChild);
+            return;
+        }
+
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _this_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _this_.getPos();
+	}
 }
