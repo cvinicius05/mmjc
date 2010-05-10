@@ -91,4 +91,14 @@ public final class ANumberExpression extends PExpression
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _number_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _number_.getPos();
+	}
 }

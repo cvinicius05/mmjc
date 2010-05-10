@@ -15,9 +15,9 @@ public class ErrorLog {
 	}
 	
 	public void printErrors() {
+		System.err.println(errors.size()+" errors reported:");
 		for(String e : errors)
 			System.err.println(e);
-		System.out.println(errors.size()+" errors reported.");
 	}
 	
 	public static ErrorLog getInstance() {

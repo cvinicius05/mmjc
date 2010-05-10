@@ -190,4 +190,14 @@ public final class ANonextNextclass extends PNextclass
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _id_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _id_.getPos();
+	}
 }

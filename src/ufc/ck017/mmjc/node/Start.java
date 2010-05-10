@@ -129,4 +129,14 @@ public final class Start extends Node
             toString(this._pProgram_) +
             toString(this._eof_);
     }
+
+	@Override
+	public int getLine() {
+		return _pProgram_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _pProgram_.getPos();
+	}
 }

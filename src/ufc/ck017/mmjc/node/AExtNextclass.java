@@ -233,4 +233,14 @@ public final class AExtNextclass extends PNextclass
 
         throw new RuntimeException("Not a child.");
     }
+
+	@Override
+	public int getLine() {
+		return _name_.getLine();
+	}
+
+	@Override
+	public int getPos() {
+		return _name_.getPos();
+	}
 }
