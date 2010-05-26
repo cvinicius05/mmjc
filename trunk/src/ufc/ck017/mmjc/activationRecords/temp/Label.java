@@ -1,4 +1,4 @@
-package ufc.ck017.mmjc.translate.activationRegister.temp;
+package ufc.ck017.mmjc.activationRecords.temp;
 
 import ufc.ck017.mmjc.symbolTable.VarSymbol;
 
