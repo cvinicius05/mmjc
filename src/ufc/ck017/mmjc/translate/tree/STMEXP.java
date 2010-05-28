@@ -1,9 +1,9 @@
 package ufc.ck017.mmjc.translate.tree;
 
 
-public class EXP1 extends Stm {
+public class STMEXP extends Stm {
 	public Exp exp; 
-	public EXP1(Exp e) {
+	public STMEXP(Exp e) {
 		exp=e;
 	}
 	
@@ -12,7 +12,7 @@ public class EXP1 extends Stm {
 	}
 	
 	public Stm build(ExpList kids) {
-		return new EXP1(kids.head);
+		return new STMEXP(kids.head);
 	}
 }
 

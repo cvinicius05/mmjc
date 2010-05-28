@@ -3,7 +3,7 @@ package ufc.ck017.mmjc.activationRecords.temp;
 import java.util.Iterator;
 
 
-public class TempList {
+public class TempList implements Iterable<Temp> {
 
 	public Temp head;
 	public TempList tail;

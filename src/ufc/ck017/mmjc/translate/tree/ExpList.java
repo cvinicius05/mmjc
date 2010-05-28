@@ -23,10 +23,9 @@ public class ExpList {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void add(int i, CONST const1) {
-		// TODO Auto-generated method stub
-
-	}
+	/*public void add(int i, CONST const1) {
+		// TODO
+	}*/
 }
 
 

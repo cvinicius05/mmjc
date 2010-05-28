@@ -18,7 +18,7 @@ class ExpCall extends Stm {
 	ExpCall(CALL c) {call=c;}
 	public ExpList kids() {return call.kids();}
 	public Stm build(ExpList kids) {
-		return new EXP1(call.build(kids));
+		return new STMEXP(call.build(kids));
 	}
 }	 
 
@@ -31,8 +31,8 @@ class StmExpList {
 public class Canon {
 
 	static boolean isNop(Stm a) {
-		return a instanceof EXP1
-		&& ((EXP1)a).exp instanceof CONST;
+		return a instanceof STMEXP
+		&& ((STMEXP)a).exp instanceof CONST;
 	}
 
 	static Stm seq(Stm a, Stm b) {
@@ -63,7 +63,7 @@ public class Canon {
 		else return reorder_stm(s);
 	}
 
-	static Stm do_stm(EXP1 s) { 
+	static Stm do_stm(STMEXP s) { 
 		if (s.exp instanceof CALL)
 			return reorder_stm(new ExpCall((CALL)s.exp));
 		else return reorder_stm(s);
@@ -72,7 +72,7 @@ public class Canon {
 	static Stm do_stm(Stm s) {
 		if (s instanceof SEQ) return do_stm((SEQ)s);
 		else if (s instanceof MOVE) return do_stm((MOVE)s);
-		else if (s instanceof EXP1) return do_stm((EXP1)s);
+		else if (s instanceof STMEXP) return do_stm((STMEXP)s);
 		else return reorder_stm(s);
 	}
 
@@ -97,7 +97,7 @@ public class Canon {
 		return new ESEQ(x.stm, e.build(x.exps));
 	}
 
-	static StmExpList nopNull = new StmExpList(new EXP1(new CONST(0)),null);
+	static StmExpList nopNull = new StmExpList(new STMEXP(new CONST(0)),null);
 
 	static StmExpList reorder(ExpList exps) {
 		if (exps==null) return nopNull;
