@@ -1,1 +1,1 @@
-package ufc.ck017.mmjc.translate.tree;abstract public class Exp {	//atributos 	protected Exp exp;	abstract public ExpList kids();	abstract public Exp build(ExpList kids);	public Exp unEx(){		return exp;	}	public Stm unNx(){		return new EXP1(exp);	}}
+package ufc.ck017.mmjc.translate.tree;abstract public class Exp {	//atributos 	protected Exp exp;	abstract public ExpList kids();	abstract public Exp build(ExpList kids);	public Exp unEx(){		return exp;	}	public Stm unNx(){		return new STMEXP(exp);	}}

@@ -60,8 +60,7 @@ public class VarSymbol {
 	 * @return novo s&iacute;mbolo associado ao token de entrada.
 	 */
 	public static VarSymbol symbol(TId id) {
-		String str = id.getText();
-	    String u = str.intern();
+	    String u = id.getText().intern();
 	    VarSymbol s = varDict.get(u);
 
 	    if(s == null) {

@@ -1,6 +1,6 @@
 package ufc.ck017.mmjc.activationRecords.temp;
 
-import ufc.ck017.mmjc.symbolTable.VarSymbol;
+import ufc.ck017.mmjc.util.Symbol;
 
 /**
  * A Label represents an address in assembly language.
@@ -35,7 +35,7 @@ public class Label  {
 	/**
 	* Makes a new label whose name is the same as a symbol.
 	*/
-	public Label(VarSymbol s) {
+	public Label(Symbol s) {
 		this(s.toString());
 	}
 }
