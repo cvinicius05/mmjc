@@ -4,7 +4,7 @@ import java.util.List;
 
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.assem.Instr;
+import ufc.ck017.mmjc.translate.assem.Instr;
 import ufc.ck017.mmjc.translate.tree.Exp;
 import ufc.ck017.mmjc.translate.tree.Stm;
 import ufc.ck017.mmjc.util.Symbol;
