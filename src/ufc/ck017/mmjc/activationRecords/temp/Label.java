@@ -25,7 +25,7 @@ public class Label  {
 	* the same name <tt>s</tt>.
 	*/
 	public Label(String n) {
-		name=n;
+		name=n.intern();
 	}
 
 	/**
