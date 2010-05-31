@@ -3,22 +3,23 @@ package ufc.ck017.mmjc.translate;
 import java.util.LinkedList;
 import java.util.List;
 
+import ufc.ck017.mmjc.translate.tree.SEQ;
 import ufc.ck017.mmjc.translate.tree.Stm;
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
 
-public abstract class Frag {
+public class Frag {
 
 	private Frame frame;
-	private List<Stm> body;
+	private Stm body;
 	
 	public Frag(Frame frame, Stm stm) {
 		this.frame = frame;
 		LinkedList<Stm> list = new LinkedList<Stm>();
 		list.add(stm);
-		this.body = frame.procEntryExit1(list);
+		this.body = linearize(frame.procEntryExit1(list));
 	}
 	
-	public List<Stm> getBody() {
+	public Stm getBody() {
 		return body;
 	}
 	
@@ -26,7 +27,12 @@ public abstract class Frag {
 		return frame;
 	}
 	
-	public void setBody(List<Stm> linearize) {
-		body = linearize;
+	private Stm linearize(List<Stm> stmlist) {
+		Stm aux = stmlist.remove(0);
+		
+		for(Stm stm : stmlist)
+			aux = new SEQ(aux, stm);
+		
+		return aux;
 	}
 }

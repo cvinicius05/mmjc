@@ -51,7 +51,7 @@ public class VarSymbol {
 	    
 	    return vs;
 	}
-
+	
 	/**
 	 *Gera um novo s&iacute;mbolo associado ao nome armazenado
 	 *pelo token de entrada <b>TId</b>.
@@ -60,7 +60,16 @@ public class VarSymbol {
 	 * @return novo s&iacute;mbolo associado ao token de entrada.
 	 */
 	public static VarSymbol symbol(TId id) {
-	    String u = id.getText().intern();
+		return symbol(id.getText());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof VarSymbol) && (((VarSymbol)obj).hashCode() == this.hashCode());
+	}
+
+	public static VarSymbol symbol(String str) {
+	    String u = str.intern();
 	    VarSymbol s = varDict.get(u);
 
 	    if(s == null) {
@@ -68,10 +77,5 @@ public class VarSymbol {
 	    	varDict.put(u,s);
 	    }
 	    return s;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof VarSymbol) && (((VarSymbol)obj).hashCode() == this.hashCode());
 	}
 }
