@@ -3,6 +3,7 @@ package ufc.ck017.mmjc.translate.tree;
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 
 public class CJUMP extends Stm {
+
 	public int relop;
 	public Exp left, right;
 	public Label iftrue, iffalse;
@@ -11,7 +12,6 @@ public class CJUMP extends Stm {
 	public CJUMP(int rel, Exp l, Exp r, Label t, Label f) {
 		relop=rel; left=l; right=r; iftrue=t; iffalse=f;
 	}
-
 
 	public ExpList kids() {
 		return new ExpList(left, new ExpList(right,null));
@@ -37,4 +37,3 @@ public class CJUMP extends Stm {
 		}
 	}
 }
-

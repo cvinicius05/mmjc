@@ -3,6 +3,8 @@
 package ufc.ck017.mmjc.node;
 
 import ufc.ck017.mmjc.analysis.*;
+import ufc.ck017.mmjc.translate.TranslateVisitor;
+import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
 public final class AInttType extends PType
@@ -34,6 +36,10 @@ public final class AInttType extends PType
         ((Analysis) sw).caseAInttType(this);
     }
 
+    public Exp accept(TranslateVisitor v) {
+		return v.visit(this);
+	}
+    
     public TIntt getIntt()
     {
         return this._intt_;
