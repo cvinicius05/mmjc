@@ -3,13 +3,14 @@ package ufc.ck017.mmjc.translate.tree;
 import java.util.Iterator;
 
 public class StmList {
+
 	public Stm head;
 	public StmList tail;
-	
+
 	public StmList(Stm h, StmList t) {
 		head=h; tail=t;
 	}
-	
+
 	public Iterator<Stm> iterator() {
 		return new It(this);
 	}
@@ -17,11 +18,11 @@ public class StmList {
 	public void add(int i, Stm stm) {
 	
 	}
-	
+
 	public void add(Stm stm) {
 	
 	}
-	
+
 	private class It implements Iterator<Stm> {
 
 		StmList l;
@@ -46,6 +47,3 @@ public class StmList {
 
 	}
 }
-
-
-

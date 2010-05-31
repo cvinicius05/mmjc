@@ -4,6 +4,8 @@ package ufc.ck017.mmjc.node;
 
 import java.util.*;
 import ufc.ck017.mmjc.analysis.*;
+import ufc.ck017.mmjc.translate.TranslateVisitor;
+import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
 public final class AManyStatement extends PStatement
@@ -34,6 +36,10 @@ public final class AManyStatement extends PStatement
     {
         ((Analysis) sw).caseAManyStatement(this);
     }
+    
+    public Exp accept(TranslateVisitor v) {
+		return v.visit(this);
+	}
 
     public LinkedList<PStatement> getStatement()
     {

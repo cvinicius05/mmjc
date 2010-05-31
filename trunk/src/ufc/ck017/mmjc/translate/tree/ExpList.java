@@ -3,6 +3,7 @@ package ufc.ck017.mmjc.translate.tree;
 import java.util.List;
 
 public class ExpList {
+
 	public Exp head;
 	public ExpList tail;
 
@@ -27,6 +28,3 @@ public class ExpList {
 		// TODO
 	}*/
 }
-
-
-

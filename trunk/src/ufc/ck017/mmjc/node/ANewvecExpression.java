@@ -3,6 +3,8 @@
 package ufc.ck017.mmjc.node;
 
 import ufc.ck017.mmjc.analysis.*;
+import ufc.ck017.mmjc.translate.TranslateVisitor;
+import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
 public final class ANewvecExpression extends PExpression
@@ -33,6 +35,10 @@ public final class ANewvecExpression extends PExpression
     {
         ((Analysis) sw).caseANewvecExpression(this);
     }
+    
+    public Exp accept(TranslateVisitor v) {
+		return v.visit(this);
+	}
 
     public PExpression getExpression()
     {

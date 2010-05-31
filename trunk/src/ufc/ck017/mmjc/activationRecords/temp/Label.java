@@ -7,6 +7,7 @@ import ufc.ck017.mmjc.util.Symbol;
  */
 
 public class Label  {
+
 	private String name;
 	private static int count;
 
@@ -14,7 +15,9 @@ public class Label  {
 	 * a printable representation of the label, for use in assembly 
 	* language output.
 	*/
-	public String toString() {return name;}
+	public String toString() {
+		return name;
+	}
 
 	/**
 	* Makes a new label that prints as "name".

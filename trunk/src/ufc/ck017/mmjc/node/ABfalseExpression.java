@@ -3,6 +3,8 @@
 package ufc.ck017.mmjc.node;
 
 import ufc.ck017.mmjc.analysis.*;
+import ufc.ck017.mmjc.translate.TranslateVisitor;
+import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
 public final class ABfalseExpression extends PExpression
@@ -34,6 +36,10 @@ public final class ABfalseExpression extends PExpression
         ((Analysis) sw).caseABfalseExpression(this);
     }
 
+    public Exp accept(TranslateVisitor v) {
+		return v.visit(this);
+	}
+    
     public TFalse getFalse()
     {
         return this._false_;
