@@ -4,7 +4,6 @@ package ufc.ck017.mmjc.node;
 
 import java.util.*;
 import ufc.ck017.mmjc.analysis.*;
-import ufc.ck017.mmjc.translate.TranslateVisitor;
 import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
@@ -61,10 +60,6 @@ public final class AMethod extends PMethod
     {
         ((Analysis) sw).caseAMethod(this);
     }
-    
-    public Exp accept(TranslateVisitor v) {
-		return v.visit(this);
-	}
 
     public PType getType()
     {
