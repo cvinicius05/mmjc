@@ -74,17 +74,6 @@ public class TypeChecker extends DepthFirstAdapter {
 	public void inAMethod(AMethod node) {
 		table.enterScope(node.getId());
 	}
-	
-	/*@Override
-	public void outAMethod(AMethod node) {
-		TypeSymbol rmtype = TypeSymbol.search(node.getType());
-		TypeSymbol retype = node.getExpression().getType();
-		
-		if(!table.isSubclassOf(rmtype, retype))
-			errors.addError(SemanticError.invalidReturnType(node.getId(), rmtype, retype));
-		
-		table.exitScope();
-	}*/
 
 	@Override
 	public void outAMethod(AMethod node) {
