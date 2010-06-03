@@ -51,6 +51,7 @@ public class Class extends ScopeEntry {
 	public void materialize(Class c) {
 		if(phantom) {
 			this.localVariables = c.localVariables;
+			this.fieldsIndex = c.fieldsIndex;
 			this.methods = c.methods;
 			this.parent = c.parent;
 			phantom = false;

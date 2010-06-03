@@ -14,10 +14,12 @@ public class ErrorLog {
 		errors.add(e);
 	}
 	
-	public void printErrors() {
+	public int printErrors() {
 		System.err.println(errors.size()+" errors reported:");
 		for(String e : errors)
 			System.err.println(e);
+		
+		return errors.size();
 	}
 	
 	public static ErrorLog getInstance() {

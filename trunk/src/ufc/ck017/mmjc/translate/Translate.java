@@ -81,7 +81,7 @@ public class Translate extends DepthFirstAdapter {
 				body = new SEQ(stmstack.pop(), body);
 		} else body = new STMEXP(ZERO);
 
-		currframe = currframe.newFrame(new Label("main"), new LinkedList<Boolean>());
+		currframe = currframe.newFrame(new Label("main"), null);
 		frags.add(new Frag(currframe, body));
 	}
 
