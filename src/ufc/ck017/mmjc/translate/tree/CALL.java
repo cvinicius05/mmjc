@@ -15,7 +15,7 @@ public class CALL extends Exp {
 	}
 
 	public ExpList kids() {
-		return new ExpList(func,args);
+		return new ExpList(func, args);
 	}
 
 	public Exp build(ExpList kids) {

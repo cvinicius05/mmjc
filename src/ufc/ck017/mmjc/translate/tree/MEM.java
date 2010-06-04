@@ -9,7 +9,7 @@ public class MEM extends Exp {
 	}
 
 	public ExpList kids() {
-		return new ExpList(exp,null);
+		return new ExpList(exp, null);
 	}
 
 	public Exp build(ExpList kids) {

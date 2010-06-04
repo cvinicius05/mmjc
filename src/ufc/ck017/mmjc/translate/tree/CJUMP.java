@@ -14,11 +14,11 @@ public class CJUMP extends Stm {
 	}
 
 	public ExpList kids() {
-		return new ExpList(left, new ExpList(right,null));
+		return new ExpList(left, new ExpList(right, null));
 	}
 
 	public Stm build(ExpList kids) {
-		return new CJUMP(relop,kids.head,kids.tail.head,iftrue,iffalse);
+		return new CJUMP(relop, kids.head, kids.tail.head, iftrue, iffalse);
 	}
 
 	public static int notRel(int relop) {
