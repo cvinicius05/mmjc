@@ -11,11 +11,11 @@ public class TempList implements Iterable<Temp> {
 		head=h;
 		tail=t;
 	}
-	
+
 	public Iterator<Temp> iterator() {
 		return new It(this);
 	}
-	
+
 	private class It implements Iterator<Temp>{
 
 		TempList l;
