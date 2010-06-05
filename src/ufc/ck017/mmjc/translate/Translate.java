@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import ufc.ck017.mmjc.activationRecords.frame.Access;
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
-import ufc.ck017.mmjc.activationRecords.jouette.JouetteFrame;
+import ufc.ck017.mmjc.activationRecords.frame.JouetteFrame;
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
 import ufc.ck017.mmjc.analysis.DepthFirstAdapter;
