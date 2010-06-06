@@ -1,6 +1,7 @@
 package ufc.ck017.mmjc.activationRecords.temp;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class TempList implements Iterable<Temp> {
 
@@ -10,6 +11,23 @@ public class TempList implements Iterable<Temp> {
 	public TempList(Temp h, TempList t) {
 		head=h;
 		tail=t;
+	}
+
+	public TempList(LinkedList<Temp> l) {
+		if(l.size() > 1) {
+			Iterator<Temp> i = l.descendingIterator();
+			
+			head = i.next();
+			tail = null;
+			
+			while(i.hasNext()) {
+				tail = new TempList(head, tail);
+				head = i.next();
+			}
+		} else {
+			head = null;
+			tail = null;
+		}
 	}
 
 	public Iterator<Temp> iterator() {

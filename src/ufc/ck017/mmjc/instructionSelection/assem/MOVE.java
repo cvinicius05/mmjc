@@ -1,1 +1,23 @@
-package ufc.ck017.mmjc.instructionSelection.assem;import ufc.ck017.mmjc.activationRecords.temp.Temp;import ufc.ck017.mmjc.activationRecords.temp.TempMap;public class MOVE extends Instr {	private static Temp[] use;	private static Temp[] def;		public MOVE(String assem, Temp dst, Temp src) {		this.assem = assem;		use = new Temp[]{src};		def = new Temp[]{dst};		jumps = null;	}	public Temp dst() {		return def[0];	}	public Temp src() {		return use[0];	}	public String format(TempMap m) {		if (m.tempMap(src()) == m.tempMap(dst()))			return "#" + super.format(m);		return super.format(m);	}	private static Temp[] getDef() {		return def;	}	private static Temp[] getUse() {		return def;	}	@Override	public Temp[] def() {		return getDef();	}	@Override	public Targets jumps() {		return null;	}	@Override	public Temp[] use() {		return getUse();	}}
+package ufc.ck017.mmjc.instructionSelection.assem;
+
+import ufc.ck017.mmjc.activationRecords.temp.Temp;
+import ufc.ck017.mmjc.activationRecords.temp.TempList;
+
+public class MOVE extends Instr {
+	public Temp dst;	 
+	public Temp src;
+
+	public MOVE(String a, Temp d, Temp s) {
+		assem=a; dst=d; src=s;
+	}
+	
+	public TempList use() {
+		return new TempList(src, null);
+	}
+	public TempList def() {
+		return new TempList(dst, null);
+	}
+	public Targets jumps() {
+		return null;
+	}
+}

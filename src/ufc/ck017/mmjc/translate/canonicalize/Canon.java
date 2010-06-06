@@ -48,7 +48,7 @@ class StmExpList {
 public class Canon {
 
 	static StmExpList nopNull = new StmExpList(new STMEXP(new CONST(0)), null);
-	
+
 	static boolean isNop(Stm a) {
 		return a instanceof STMEXP && ((STMEXP)a).exp instanceof CONST;
 	}
@@ -124,14 +124,14 @@ public class Canon {
 				else {
 					Temp t = new Temp();
 					return new StmExpList(
-										seq(aa.stm, 
-											seq(new MOVE(
-														new TEMP(t),
-														aa.exp),
-												bb.stm)
-											),
-											new ExpList(new TEMP(t), bb.exps)
-										);
+							seq(aa.stm, 
+									seq(new MOVE(
+											new TEMP(t),
+											aa.exp),
+											bb.stm)
+							),
+							new ExpList(new TEMP(t), bb.exps)
+					);
 				}
 			}
 		}
