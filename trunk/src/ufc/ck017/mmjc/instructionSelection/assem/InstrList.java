@@ -1,8 +1,9 @@
 package ufc.ck017.mmjc.instructionSelection.assem;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
-public class InstrList {
+public class InstrList implements Iterable<Instr>{
 	public Instr head;
 	public InstrList tail;
 
@@ -10,6 +11,23 @@ public class InstrList {
 		head=h; tail=t;
 	}
 	
+	public InstrList(LinkedList<Instr> l) {
+		if(l.size() > 1) {
+			Iterator<Instr> i = l.descendingIterator();
+			
+			head = i.next();
+			tail = null;
+			
+			while(i.hasNext()) {
+				tail = new InstrList(head, tail);
+				head = i.next();
+			}
+		} else {
+			head = null;
+			tail = null;
+		}
+	}
+
 	public Iterator<Instr> iterator() {
 		return new It(this);
 	}

@@ -1,1 +1,16 @@
-package ufc.ck017.mmjc.instructionSelection.assem;import ufc.ck017.mmjc.activationRecords.temp.Label;import ufc.ck017.mmjc.activationRecords.temp.Temp;public class LABEL extends Instr {	public Label label;	public LABEL(String assem, Label l) {		this.assem = assem;		label = l;		use = null;		def = null;		jumps = null;	}		@Override	public Temp[] def() {		return def;	}	@Override	public Targets jumps() {		return (Targets) jumps;	}	@Override	public Temp[] use() {		return use;	}}
+package ufc.ck017.mmjc.instructionSelection.assem;
+
+import ufc.ck017.mmjc.activationRecords.temp.Label;
+import ufc.ck017.mmjc.activationRecords.temp.TempList;
+
+public class LABEL extends Instr {
+	public Label label;
+
+	public LABEL(String a, Label l) {
+		assem=a; label=l;
+	}
+
+	public TempList use() {return null;}
+	public TempList def() {return null;}
+	public Targets jumps()	{return null;}
+}

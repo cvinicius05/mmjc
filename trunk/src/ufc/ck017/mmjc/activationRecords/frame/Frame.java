@@ -26,6 +26,8 @@ public abstract class Frame implements TempMap{
 	public abstract Access allocLocal(boolean escape);
 	public abstract Exp externalCall(String func, List<Exp> args);
 	
+	public abstract List<Instr> emitCallerSave(Instr call);
+	
 	public abstract List<Stm> procEntryExit1(List<Stm> body);
 	public abstract List<Instr> procEntryExit2(List<Instr> body);
 	//public abstract Proc procEntryExit3(List<Instr> body);

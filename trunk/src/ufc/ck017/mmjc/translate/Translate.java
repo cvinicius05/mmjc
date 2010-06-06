@@ -99,11 +99,12 @@ public class Translate extends DepthFirstAdapter {
 
 		currframe = currframe.newFrame(new Label(currclass+"$"+currmethod), formals);
 		Iterator<Access> formalAccesses = currframe.formals.iterator();
+		TEMP fp = new TEMP(currframe.FP());
 
-		accesstable.put(VarSymbol.symbol("this"), formalAccesses.next().exp());
+		accesstable.put(VarSymbol.symbol("this"), formalAccesses.next().exp(fp));
 
 		for(PVar var : node.getParam())
-			accesstable.put(VarSymbol.search(((AVar)var).getId().getText()), formalAccesses.next().exp());
+			accesstable.put(VarSymbol.search(((AVar)var).getId().getText()), formalAccesses.next().exp(fp));
 
 		for(PVar var : node.getLocal()) {
 			Exp nlexp = currframe.allocLocal(false).exp(new TEMP(currframe.FP()));
