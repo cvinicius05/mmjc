@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import ufc.ck017.mmjc.activationRecords.frame.Access;
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
@@ -25,8 +24,8 @@ public class Translate extends DepthFirstAdapter {
 	private Stm localDecl = null;
 	private Hashtable<VarSymbol, Exp> accesstable = null;
 	private Frame currframe = new JouetteFrame();
-	private Stack<Exp> expstack = new Stack<Exp>();
-	private Stack<Stm> stmstack = new Stack<Stm>();
+	private LinkedList<Exp> expstack = new LinkedList<Exp>();
+	private LinkedList<Stm> stmstack = new LinkedList<Stm>();
 	private List<Frag> frags = new LinkedList<Frag>();
 	private SymbolTable table = SymbolTable.getInstance();
 	private final Exp ZERO = new CONST(0);
@@ -75,10 +74,10 @@ public class Translate extends DepthFirstAdapter {
 		Stm body = null;
 
 		if(node.getStatement().size() > 0) {
-			body = stmstack.pop();
+			body = stmstack.removeFirst();
 
 			while(!stmstack.isEmpty())
-				body = new SEQ(stmstack.pop(), body);
+				body = new SEQ(stmstack.removeFirst(), body);
 		} else body = new STMEXP(ZERO);
 
 		currframe = currframe.newFrame(new Label("main"), null);
@@ -121,13 +120,13 @@ public class Translate extends DepthFirstAdapter {
 	@Override
 	public void outAMethod(AMethod node) {
 		Stm methodBody = null;
-		Stm returnvalue = new MOVE(new TEMP(currframe.RV()), expstack.pop());
+		Stm returnvalue = new MOVE(new TEMP(currframe.RV()), expstack.removeFirst());
 
 		if(node.getStatement().size() > 0) {
-			methodBody = stmstack.pop();
+			methodBody = stmstack.removeFirst();
 
 			while(!stmstack.isEmpty())
-				methodBody = new SEQ(stmstack.pop(), methodBody);
+				methodBody = new SEQ(stmstack.removeFirst(), methodBody);
 		}
 
 		if(methodBody == null)
@@ -143,61 +142,61 @@ public class Translate extends DepthFirstAdapter {
 
 	@Override
 	public void outANumberExpression(ANumberExpression node) {
-		expstack.push(new CONST(Integer.parseInt(node.getNumber().getText())));
+		expstack.addFirst(new CONST(Integer.parseInt(node.getNumber().getText())));
 	}
 
 	@Override
 	public void outABfalseExpression(ABfalseExpression node) {
-		expstack.push(ZERO);
+		expstack.addFirst(ZERO);
 	}
 
 	@Override
 	public void outABtrueExpression(ABtrueExpression node) {
-		expstack.push(ONE);
+		expstack.addFirst(ONE);
 	}
 
 	@Override
 	public void outASelfExpression(ASelfExpression node) {
-		expstack.push(accesstable.get(VarSymbol.symbol("this")));
+		expstack.addFirst(accesstable.get(VarSymbol.symbol("this")));
 	}
 
 	@Override
 	public void outANotExpression(ANotExpression node) {
-		expstack.push(new BINOP(BINOP.XOR, expstack.pop(), ONE));
+		expstack.addFirst(new BINOP(BINOP.XOR, expstack.removeFirst(), ONE));
 	}
 
 	@Override
 	public void outAAndExpression(AAndExpression node) {
-		Exp temp = expstack.pop();
-		expstack.push(new BINOP(BINOP.AND, expstack.pop(), temp));
+		Exp temp = expstack.removeFirst();
+		expstack.addFirst(new BINOP(BINOP.AND, expstack.removeFirst(), temp));
 	}
 
 	@Override
 	public void outAPlusExpression(APlusExpression node) {
-		Exp temp = expstack.pop();
-		expstack.push(new BINOP(BINOP.PLUS, expstack.pop(), temp));
+		Exp temp = expstack.removeFirst();
+		expstack.addFirst(new BINOP(BINOP.PLUS, expstack.removeFirst(), temp));
 	}
 
 	@Override
 	public void outAMinusExpression(AMinusExpression node) {
-		Exp temp = expstack.pop();
-		expstack.push(new BINOP(BINOP.MINUS, expstack.pop(), temp));
+		Exp temp = expstack.removeFirst();
+		expstack.addFirst(new BINOP(BINOP.MINUS, expstack.removeFirst(), temp));
 	}
 
 	@Override
 	public void outAMultExpression(AMultExpression node) {
-		Exp temp = expstack.pop();
-		expstack.push(new BINOP(BINOP.MUL, expstack.pop(), temp));
+		Exp temp = expstack.removeFirst();
+		expstack.addFirst(new BINOP(BINOP.MUL, expstack.removeFirst(), temp));
 	}
 
 	@Override
 	public void outAGthanExpression(AGthanExpression node) {
-		Exp temp = expstack.pop();
+		Exp temp = expstack.removeFirst();
 		Label t = new Label();
 		Label f = new Label();
 		TEMP value = new TEMP(new Temp());
 
-		expstack.push(
+		expstack.addFirst(
 				new ESEQ(
 						new SEQ(
 								new MOVE(
@@ -205,7 +204,7 @@ public class Translate extends DepthFirstAdapter {
 										ONE
 								),
 								new SEQ(
-										new CJUMP(CJUMP.GT, expstack.pop(), temp, t, f),
+										new CJUMP(CJUMP.GT, expstack.removeFirst(), temp, t, f),
 										new SEQ(
 												new LABEL(f),
 												new SEQ(
@@ -224,12 +223,12 @@ public class Translate extends DepthFirstAdapter {
 
 	@Override
 	public void outALthanExpression(ALthanExpression node) {
-		Exp temp = expstack.pop();
+		Exp temp = expstack.removeFirst();
 		Label t = new Label();
 		Label f = new Label();
 		TEMP value = new TEMP(new Temp());
 
-		expstack.push(
+		expstack.addFirst(
 				new ESEQ(
 						new SEQ(
 								new MOVE(
@@ -237,7 +236,7 @@ public class Translate extends DepthFirstAdapter {
 										ONE
 								),
 								new SEQ(
-										new CJUMP(CJUMP.LT, expstack.pop(), temp, t, f),
+										new CJUMP(CJUMP.LT, expstack.removeFirst(), temp, t, f),
 										new SEQ(
 												new LABEL(f),
 												new SEQ(
@@ -286,13 +285,13 @@ public class Translate extends DepthFirstAdapter {
 							ZERO
 					));
 
-		expstack.push(new ESEQ(init, treeobj));
+		expstack.addFirst(new ESEQ(init, treeobj));
 	}
 
 	@Override
 	public void outANewvecExpression(ANewvecExpression node) {
 		List<Exp> args = new LinkedList<Exp>();
-		Exp size = expstack.pop();
+		Exp size = expstack.removeFirst();
 		Label condition = new Label();
 		Label body = new Label();
 		Label done = new Label();
@@ -329,12 +328,12 @@ public class Translate extends DepthFirstAdapter {
 		init = new SEQ(init, new CJUMP(CJUMP.GT, i, ONE, body, done));
 		init = new SEQ(init, new LABEL(done));
 
-		expstack.push(new ESEQ(init, treearray));
+		expstack.addFirst(new ESEQ(init, treearray));
 	}
 
 	@Override
 	public void outALengthExpression(ALengthExpression node) {
-		expstack.push(new MEM(expstack.pop()));
+		expstack.addFirst(new MEM(expstack.removeFirst()));
 	}
 
 	@Override
@@ -342,12 +341,13 @@ public class Translate extends DepthFirstAdapter {
 		ExpList args = null;
 		int size = node.getPar().size();
 
-		for(int i=0; i<size; i++)
-			args = new ExpList(expstack.pop(), args);
+		for(int i=0; i<size; i++) {
+			args = new ExpList(expstack.removeFirst(), args);
+		}
 
-		args = new ExpList(expstack.pop(), args); // passando o endereço do *this*
+		args = new ExpList(expstack.removeFirst(), args); // passando o endereço do *this*
 
-		expstack.push(
+		expstack.addFirst(
 				new CALL(
 						new NAME(new Label(node.getObj().getType()+"$"+VarSymbol.search(node.getId().getText()))),
 						args
@@ -356,13 +356,13 @@ public class Translate extends DepthFirstAdapter {
 
 	@Override
 	public void outAVectorExpression(AVectorExpression node) {
-		Exp index = expstack.pop();
+		Exp index = expstack.removeFirst();
 
-		expstack.push(
+		expstack.addFirst(
 				new MEM(
 						new BINOP(
 								BINOP.PLUS,
-								expstack.pop(),
+								expstack.removeFirst(),
 								new BINOP(
 										BINOP.MUL,
 										new BINOP(
@@ -381,9 +381,9 @@ public class Translate extends DepthFirstAdapter {
 		Exp var = accesstable.get(VarSymbol.search(node.getId().getText()));
 
 		if(var != null)
-			expstack.push(var);
+			expstack.addFirst(var);
 		else
-			expstack.push(getField(VarSymbol.search(node.getId().getText())));
+			expstack.addFirst(getField(VarSymbol.search(node.getId().getText())));
 	}
 
 	@Override
@@ -392,21 +392,21 @@ public class Translate extends DepthFirstAdapter {
 		Exp var = accesstable.get(vsymbol);
 
 		if(var == null) var = getField(vsymbol);
-		stmstack.push(
+		stmstack.addFirst(
 				new MOVE(
 						var,
-						expstack.pop()
+						expstack.removeFirst()
 				));
 	}
 
 	@Override
 	public void outAVatbStatement(AVatbStatement node) {
 		VarSymbol vsymbol = VarSymbol.search(node.getId().getText());
-		Exp value = expstack.pop();
+		Exp value = expstack.removeFirst();
 		Exp var = accesstable.get(vsymbol);
 
 		if(var == null) var = getField(vsymbol);
-		stmstack.push(
+		stmstack.addFirst(
 				new MOVE(
 						new MEM(
 								new BINOP(
@@ -416,7 +416,7 @@ public class Translate extends DepthFirstAdapter {
 												BINOP.MUL,
 												new BINOP(
 														BINOP.PLUS,
-														expstack.pop(),
+														expstack.removeFirst(),
 														ONE
 												),
 												new CONST(currframe.wordSize())
@@ -433,11 +433,11 @@ public class Translate extends DepthFirstAdapter {
 		Label f = new Label();
 		Label done = new Label();
 
-		stmstack.push(
+		stmstack.addFirst(
 				new SEQ(
 						new CJUMP(
 								CJUMP.EQ,
-								expstack.pop(),
+								expstack.removeFirst(),
 								ONE,
 								t,
 								f
@@ -445,13 +445,13 @@ public class Translate extends DepthFirstAdapter {
 						new SEQ(
 								new LABEL(f),
 								new SEQ(
-										stmstack.pop(),
+										stmstack.removeFirst(),
 										new SEQ(
 												new JUMP(done),
 												new SEQ(
 														new LABEL(t),
 														new SEQ(
-																stmstack.pop(),
+																stmstack.removeFirst(),
 																new LABEL(done)
 														)
 												)
@@ -467,19 +467,19 @@ public class Translate extends DepthFirstAdapter {
 		Label done = new Label();
 		Label condition = new Label();
 
-		stmstack.push(
+		stmstack.addFirst(
 				new SEQ(
 						new JUMP(condition),
 						new SEQ(
 								new LABEL(body),
 								new SEQ(
-										stmstack.pop(),
+										stmstack.removeFirst(),
 										new SEQ(
 												new LABEL(condition),
 												new SEQ(
 														new CJUMP(
 																CJUMP.EQ,
-																expstack.pop(),
+																expstack.removeFirst(),
 																ONE,
 																body,
 																done
@@ -495,9 +495,9 @@ public class Translate extends DepthFirstAdapter {
 	@Override
 	public void outAPrintStatement(APrintStatement node) {
 		List<Exp> args = new LinkedList<Exp>();
-		args.add(expstack.pop());
+		args.add(expstack.removeFirst());
 
-		stmstack.push(new STMEXP(currframe.externalCall("print", args)));
+		stmstack.addFirst(new STMEXP(currframe.externalCall("print", args)));
 	}
 
 	@Override
@@ -506,12 +506,12 @@ public class Translate extends DepthFirstAdapter {
 		Stm stms = null;
 
 		if(size > 0) {
-			stms = stmstack.pop();
+			stms = stmstack.removeFirst();
 
 			for(int i = 1; i < size; i++)
-				stms = new SEQ(stmstack.pop(), stms);
+				stms = new SEQ(stmstack.removeFirst(), stms);
 
-			stmstack.push(stms);
+			stmstack.addFirst(stms);
 		}	
 	}
 }

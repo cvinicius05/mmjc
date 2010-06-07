@@ -6,9 +6,9 @@ import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
 import ufc.ck017.mmjc.activationRecords.temp.TempMap;
 import ufc.ck017.mmjc.instructionSelection.assem.Instr;
-import ufc.ck017.mmjc.instructionSelection.assem.InstrList;
 import ufc.ck017.mmjc.translate.tree.Exp;
 import ufc.ck017.mmjc.translate.tree.Stm;
+import ufc.ck017.mmjc.translate.tree.StmList;
 
 public abstract class Frame implements TempMap{
 
@@ -31,5 +31,5 @@ public abstract class Frame implements TempMap{
 	public abstract List<Stm> procEntryExit1(List<Stm> body);
 	public abstract List<Instr> procEntryExit2(List<Instr> body);
 	//public abstract Proc procEntryExit3(List<Instr> body);
-	public abstract InstrList codegen(Stm stm);
+	public abstract List<Instr> codegen(StmList stm);
 }

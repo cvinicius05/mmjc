@@ -46,6 +46,8 @@ class StmExpList {
 }
 
 public class Canon {
+	
+	private Canon(){}
 
 	static StmExpList nopNull = new StmExpList(new STMEXP(new CONST(0)), null);
 
