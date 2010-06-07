@@ -1193,10 +1193,8 @@ public class Parser
         PType ptypeNode1;
         {
             // Block
-        TIntt tinttNode2;
-        tinttNode2 = (TIntt)nodeArrayList1.get(0);
 
-        ptypeNode1 = new AInttType(tinttNode2);
+        ptypeNode1 = new AInttType();
         }
 	nodeList.add(ptypeNode1);
         return nodeList;
@@ -1213,10 +1211,8 @@ public class Parser
         PType ptypeNode1;
         {
             // Block
-        TIntv tintvNode2;
-        tintvNode2 = (TIntv)nodeArrayList1.get(0);
 
-        ptypeNode1 = new AIntvType(tintvNode2);
+        ptypeNode1 = new AIntvType();
         }
 	nodeList.add(ptypeNode1);
         return nodeList;
@@ -1233,10 +1229,8 @@ public class Parser
         PType ptypeNode1;
         {
             // Block
-        TBool tboolNode2;
-        tboolNode2 = (TBool)nodeArrayList1.get(0);
 
-        ptypeNode1 = new ABoolType(tboolNode2);
+        ptypeNode1 = new ABoolType();
         }
 	nodeList.add(ptypeNode1);
         return nodeList;
@@ -1313,10 +1307,8 @@ public class Parser
         PExpression pexpressionNode1;
         {
             // Block
-        TTrue ttrueNode2;
-        ttrueNode2 = (TTrue)nodeArrayList1.get(0);
 
-        pexpressionNode1 = new ABtrueExpression(ttrueNode2);
+        pexpressionNode1 = new ABtrueExpression();
         }
 	nodeList.add(pexpressionNode1);
         return nodeList;
@@ -1333,10 +1325,8 @@ public class Parser
         PExpression pexpressionNode1;
         {
             // Block
-        TFalse tfalseNode2;
-        tfalseNode2 = (TFalse)nodeArrayList1.get(0);
 
-        pexpressionNode1 = new ABfalseExpression(tfalseNode2);
+        pexpressionNode1 = new ABfalseExpression();
         }
 	nodeList.add(pexpressionNode1);
         return nodeList;
@@ -1353,10 +1343,8 @@ public class Parser
         PExpression pexpressionNode1;
         {
             // Block
-        TThis tthisNode2;
-        tthisNode2 = (TThis)nodeArrayList1.get(0);
 
-        pexpressionNode1 = new ASelfExpression(tthisNode2);
+        pexpressionNode1 = new ASelfExpression();
         }
 	nodeList.add(pexpressionNode1);
         return nodeList;

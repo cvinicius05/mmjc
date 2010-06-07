@@ -13,18 +13,9 @@ public class ExpList {
 	}
 
 	public ExpList(List<Exp> args) {
-		if(args.size() > 1){
-			head = args.get(0);
-			args.remove(0);
-			tail = new ExpList(args);
+		if(!args.isEmpty()) {
+			head = args.remove(0);
+			tail = (args.size() > 0 ? new ExpList(args) : null);
 		}
 	}
-
-	public ExpList(ExpList args) {
-		// TODO Auto-generated constructor stub
-	}
-
-	/*public void add(int i, CONST const1) {
-		// TODO
-	}*/
 }

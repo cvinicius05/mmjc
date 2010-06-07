@@ -21,7 +21,6 @@ public class Codegen {
 
 	public Codegen(Frame frame) {
 		this.frame = frame;
-		ilist = new LinkedList<Instr>();
 	}
 
 	private TempList L(Temp h, TempList t) {
@@ -37,8 +36,10 @@ public class Codegen {
 	}
 
 	public InstrList codegen(Stm s) {
-		munchStm(s);
 		ilist = new LinkedList<Instr>();
+		
+		munchStm(s);
+		
 		return new InstrList(ilist);
 	}
 
