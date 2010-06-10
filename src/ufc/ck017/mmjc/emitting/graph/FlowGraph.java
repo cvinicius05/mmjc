@@ -1,33 +1,35 @@
 package ufc.ck017.mmjc.emitting.graph;
 
+import java.util.List;
+
+import ufc.ck017.mmjc.activationRecords.temp.Temp;
 import ufc.ck017.mmjc.activationRecords.temp.TempList;
 import ufc.ck017.mmjc.emitting.graph.NodeList;
 import ufc.ck017.mmjc.emitting.graph.Node;
 
 /**
- * A control flow graph is a directed graph in which each edge
- * indicates a possible flow of control.	Also, each node in
- * the graph defines a set of temporaries; each node uses a set of
- * temporaries; and each node is, or is not, a <strong>move</strong>
- * instruction.
- *
+ * A control flow graph is a directed graph in which each edge indicates a
+ * possible flow of control. Also, each node in the graph defines a set of
+ * temporaries; each node uses a set of temporaries; and each node is, or is
+ * not, a <strong>move</strong> instruction.
+ * 
  * @see AssemFlowGraph
  */
 
 public abstract class FlowGraph extends Graph {
 	/**
-	 * The set of temporaries defined by this instruction or block 
+	 * The set of temporaries defined by this instruction or block
 	 */
-	public abstract TempList def(Node node);
+	public abstract List<Temp> def(Node node);
 
 	/**
-	 * The set of temporaries used by this instruction or block 
+	 * The set of temporaries used by this instruction or block
 	 */
-	public abstract TempList use(Node node);
+	public abstract List<Temp> use(Node node);
 
 	/**
-	 * True if this node represents a <strong>move</strong> instruction,
-	 * i.e. one that can be deleted if def=use. 
+	 * True if this node represents a <strong>move</strong> instruction, i.e.
+	 * one that can be deleted if def=use.
 	 */
 	public abstract boolean isMove(Node node);
 
@@ -35,22 +37,21 @@ public abstract class FlowGraph extends Graph {
 	 * Print a human-readable dump for debugging.
 	 */
 	public void show(java.io.PrintStream out) {
-		for (NodeList p=nodes(); p!=null; p=p.tail) {
-			Node n = p.head;
-			out.print(n.toString());
+		for (Node u : mynodes) {
+			out.print(u.toString());
 			out.print(": ");
-			for(TempList q=def(n); q!=null; q=q.tail) {
-				out.print(q.head.toString());
+			for (Temp t : def(u)) {
+				out.print(t.toString());
 				out.print(" ");
 			}
-			out.print(isMove(n) ? "<= " : "<- ");
-			for(TempList q=use(n); q!=null; q=q.tail) {
-				out.print(q.head.toString());
+			out.print(isMove(u) ? "<= " : "<- ");
+			for (Temp t : use(u)) {
+				out.print(t.toString());
 				out.print(" ");
 			}
 			out.print("; goto ");
-			for(NodeList q=n.succ(); q!=null; q=q.tail) {
-				out.print(q.head.toString());
+			for (Node v : u.succs) {
+				out.print(v.toString());
 				out.print(" ");
 			}
 			out.println();
@@ -58,4 +59,3 @@ public abstract class FlowGraph extends Graph {
 	}
 
 }
-

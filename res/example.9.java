@@ -9,12 +9,6 @@ class Child extends Parent {
 	Parent parent;
 	GrandParent g;
 	
-	public Child(int number, Parent p, GrandParent g) {
-		this.i = number;
-		parent = p;
-		this.g = g;
-	}
-	
 	public Child returnItself() {
 		while(!b) {
 			i = i*this.returnInt();
@@ -24,6 +18,11 @@ class Child extends Parent {
 	
 	public GrandParent getGrandParent() {
 		return g.returnSelf(g);
+	}
+	
+	public boolean setParent(Patent p) {
+		parent = p;
+		return true;
 	}
 	
 	public int getIntOfParent() {

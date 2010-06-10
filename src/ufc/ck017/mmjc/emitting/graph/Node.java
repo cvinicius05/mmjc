@@ -1,50 +1,61 @@
 package ufc.ck017.mmjc.emitting.graph;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Node {
 
 	Graph mygraph;
 	int mykey;
+
+	LinkedList<Node> succs = new LinkedList<Node>();
+	LinkedList<Node> preds = new LinkedList<Node>();
+	LinkedList<Node> adjlist = new LinkedList<Node>();
+	
 	public Node(Graph g) {
-		mygraph=g; 
-		mykey= g.nodecount++;
-		NodeList p = new NodeList(this, null);
-		if (g.mylast==null)
-			g.mynodes=g.mylast=p;
-		else g.mylast = g.mylast.tail = p;
+		mygraph = g;
+		mykey = g.nodecount++;
+		g.mynodes.add(this);
 	}
 
-	NodeList succs;
-	NodeList preds;
-	public NodeList succ() {return succs;}
-	public NodeList pred() {return preds;}
-	NodeList cat(NodeList a, NodeList b) {
-		if (a==null) return b;
-		else return new NodeList(a.head, cat(a.tail,b));
-	}
-	public NodeList adj() {return cat(succ(), pred());}
-
-	int len(NodeList l) {
-		int i=0;
-		for(NodeList p=l; p!=null; p=p.tail) i++;
-		return i;
-	}
-
-	public int inDegree() {return len(pred());}
-	public int outDegree() {return len(succ());}
-	public int degree() {return inDegree()+outDegree();} 
-
-	public boolean goesTo(Node n) {
-		return Graph.inList(n, succ());
-	}
-
-	public boolean comesFrom(Node n) {
-		return Graph.inList(n, pred());
+	public List<Node> adj() {
+		return adjlist;
 	}
 
 	public boolean adj(Node n) {
-		return goesTo(n) || comesFrom(n);
+		return adjlist.contains(n);
 	}
 
-	public String toString() {return String.valueOf(mykey);}
+	public boolean comesFrom(Node n) {
+		return preds.contains(n);
+	}
+
+	public int degree() {
+		return adjlist.size();
+	}
+
+	public boolean goesTo(Node n) {
+		return succs.contains(n);
+	}
+
+	public int inDegree() {
+		return preds.size();
+	}
+
+	public int outDegree() {
+		return succs.size();
+	}
+
+	public List<Node> pred() {
+		return preds;
+	}
+
+	public List<Node> succ() {
+		return succs;
+	}
+
+	public String toString() {
+		return String.valueOf(mykey);
+	}
 
 }
