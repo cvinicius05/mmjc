@@ -1,7 +1,6 @@
 package ufc.ck017.mmjc.instructionSelection.jouette;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
 import ufc.ck017.mmjc.activationRecords.frame.JouetteFrame;
@@ -10,9 +9,7 @@ import ufc.ck017.mmjc.activationRecords.temp.LabelList;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
 import ufc.ck017.mmjc.activationRecords.temp.TempList;
 import ufc.ck017.mmjc.instructionSelection.assem.*;
-import ufc.ck017.mmjc.instructionSelection.assem.LABEL;
 import ufc.ck017.mmjc.translate.tree.*;
-import ufc.ck017.mmjc.translate.tree.MOVE;
 
 public class Codegen {
 
@@ -29,10 +26,6 @@ public class Codegen {
 
 	private void emit(Instr inst) {
 		ilist.add(inst);
-	}
-	
-	private void emit(List<Instr> inst) {
-		ilist.addAll(inst);
 	}
 
 	public InstrList codegen(Stm s) {
@@ -100,7 +93,7 @@ public class Codegen {
 
 	private void munchMove(TEMP dst, Exp src) {
 		// MOVE(TEMP(t1), e)
-		emit(new OPER("ADD   `d0 <- `s0 + r0\n", L(munchExp(dst), null), L(munchExp(src), null)));
+		emit(new AMOVE("ADDI `d0 <- `s0 + 0\n", munchExp(dst), munchExp(src)));
 	}
 
 	private void munchMove(MEM dst, Exp src) {
@@ -122,7 +115,7 @@ public class Codegen {
 
 		// MOVE(MEM(e1), MEM(e2))
 		else if (src instanceof MEM) {
-			emit(new OPER("MOVE M[`s0] <- M[`s1]\n", null, L(munchExp(dst.exp), L(munchExp(((MEM)src).exp), null))));
+			emit(new OPER("MOVEM M[`s0] <- M[`s1]\n", null, L(munchExp(dst.exp), L(munchExp(((MEM)src).exp), null))));
 		}
 
 		// MOVE(MEM(CONST(i)), e2))
@@ -142,7 +135,7 @@ public class Codegen {
 	}
 
 	private void munchLABEL(Label label) {
-		emit(new LABEL(label.toString() + ":\n", label));
+		emit(new ALABEL(label.toString() + ":\n", label));
 	}
 
 	private void munchJUMP(Exp exp, LabelList targets) {
@@ -162,7 +155,7 @@ public class Codegen {
 	private Temp munchCALL(CALL e) {
 		Temp r = munchExp(e.func);
 		TempList l = munchArgs(0, e.args);
-		emit(frame.emitCallerSave(new OPER("CALL `s0\n", JouetteFrame.calldefs(), L(r,l))));
+		emit(new OPER("CALL `s0\n", JouetteFrame.calldefs(), L(r,l)));
 		return frame.RV();
 	}
 
