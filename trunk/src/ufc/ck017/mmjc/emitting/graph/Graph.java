@@ -10,7 +10,7 @@ public class Graph implements Iterable<Node>{
 
 	int nodecount = 0;
 
-	List<Node> mynodes = new LinkedList<Node>();
+	protected LinkedList<Node> mynodes = new LinkedList<Node>();
 	protected Dictionary<Node, Object> infotable = new Hashtable<Node, Object>(); 
 
 	public void addEdge(Node from, Node to) {
@@ -40,6 +40,10 @@ public class Graph implements Iterable<Node>{
 		return n;
 	}
 
+	public int size() {
+		return mynodes.size();
+	}
+	
 	public List<Node> nodes() {
 		return mynodes;
 	}
@@ -69,6 +73,10 @@ public class Graph implements Iterable<Node>{
 	@Override
 	public Iterator<Node> iterator() {
 		return mynodes.iterator();
+	}
+	
+	public Iterator<Node> descendingIterator() {
+		return mynodes.descendingIterator();
 	}
 
 }

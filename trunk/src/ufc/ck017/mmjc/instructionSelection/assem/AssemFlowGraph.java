@@ -3,6 +3,7 @@ package ufc.ck017.mmjc.instructionSelection.assem;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.LabelList;
@@ -21,6 +22,7 @@ public class AssemFlowGraph extends FlowGraph {
 		uses = new Hashtable<Node, TempSet>(instrs.size());
 		defs = new Hashtable<Node, TempSet>(instrs.size());
 		moves = new LinkedList<Node>();
+		Node prev = null;
 		
 		for(Instr i : instrs) {
 			Node n = newNode(i);
@@ -32,6 +34,9 @@ public class AssemFlowGraph extends FlowGraph {
 			
 			uses.put(n, ts_use);
 			defs.put(n, ts_def);
+			addEdge(prev, n);
+			
+			prev = n;
 			
 			for(Temp t : i.use())
 				ts_use.add(t);
@@ -40,30 +45,41 @@ public class AssemFlowGraph extends FlowGraph {
 				ts_def.add(t);
 		}
 		
-		for(Node n : this) {
+		for(ListIterator<Node> li = mynodes.listIterator(); li.hasNext(); ) {
+			Node n = li.next();
 			Instr i = (Instr)infotable.get(n);
 			
 			if(i.jumps() != null) {
 				LabelList list = i.jumps().labels;
 				for(Label l : list)
 					addEdge(n, labeled.get(l));
+				
+				if(i.assem.startsWith("JUMP")) {
+					rmEdge(n, li.next());
+					li.previous();
+				}
 			}
 		}
 	}
 	
 	@Override
-	public List<Temp> def(Node node) {
-		return defs.get(node).getList();
+	public TempSet def(Node node) {
+		return defs.get(node);
 	}
 
 	@Override
 	public boolean isMove(Node node) {
-		return false;
+		return moves.contains(node);
 	}
 
 	@Override
-	public List<Temp> use(Node node) {
-		return uses.get(node).getList();
+	public TempSet use(Node node) {
+		return uses.get(node);
+	}
+
+	@Override
+	public List<Node> moves() {
+		return moves;
 	}
 
 }
