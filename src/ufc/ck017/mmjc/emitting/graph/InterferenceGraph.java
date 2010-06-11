@@ -7,6 +7,6 @@ import ufc.ck017.mmjc.util.Pair;
 abstract public class InterferenceGraph extends Graph {
 	 abstract public Node tnode(Temp temp);
 	 abstract public Temp gtemp(Node node);
-	 abstract public List<Node> moves();
+	 abstract public List<Pair<Node>> moves();
 	 public int spillCost(Node node) {return 1;}
 }
