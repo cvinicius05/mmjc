@@ -27,6 +27,18 @@ public class Graph implements Iterable<Node>{
 		from.succs.add(to);
 		from.adjlist.add(to);
 	}
+	
+	public void addUEdge(Node u, Node v) {
+		if(u == null || v == null) return;
+		
+		check(u);
+		check(v);
+		
+		if (u.adj(v) || v.adj(u)) return;
+		
+		u.adjlist.add(v);
+		v.adjlist.add(u);
+	}
 
 	void check(Node n) {
 		if (n.mygraph != this)
@@ -38,6 +50,10 @@ public class Graph implements Iterable<Node>{
 		infotable.put(n, info);
 		
 		return n;
+	}
+	
+	public Object getNodeInfo(Node n) {
+		return infotable.get(n);
 	}
 
 	public int size() {

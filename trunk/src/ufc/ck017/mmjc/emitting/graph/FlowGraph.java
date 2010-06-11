@@ -3,9 +3,7 @@ package ufc.ck017.mmjc.emitting.graph;
 import java.util.List;
 
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.activationRecords.temp.TempList;
-import ufc.ck017.mmjc.emitting.graph.NodeList;
-import ufc.ck017.mmjc.emitting.graph.Node;
+import ufc.ck017.mmjc.instructionSelection.assem.AssemFlowGraph;
 import ufc.ck017.mmjc.instructionSelection.assem.TempSet;
 
 /**
