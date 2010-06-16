@@ -8,7 +8,7 @@ public class Node {
 	Graph mygraph;
 	int mykey;
 
-	LinkedList<Node> succs = new LinkedList<Node>();
+	public LinkedList<Node> succs = new LinkedList<Node>();
 	LinkedList<Node> preds = new LinkedList<Node>();
 	LinkedList<Node> adjlist = new LinkedList<Node>();
 	

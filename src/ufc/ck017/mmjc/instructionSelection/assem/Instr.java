@@ -8,6 +8,7 @@ import ufc.ck017.mmjc.activationRecords.temp.TempMap;
 
 public abstract class Instr {
 	public String assem;
+
 	public abstract TempList use();
 	public abstract TempList def();
 	public abstract Targets jumps();

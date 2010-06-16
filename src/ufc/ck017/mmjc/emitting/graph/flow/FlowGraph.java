@@ -1,9 +1,10 @@
-package ufc.ck017.mmjc.emitting.graph;
+package ufc.ck017.mmjc.emitting.graph.flow;
 
 import java.util.List;
 
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.instructionSelection.assem.AssemFlowGraph;
+import ufc.ck017.mmjc.emitting.graph.Graph;
+import ufc.ck017.mmjc.emitting.graph.Node;
 import ufc.ck017.mmjc.instructionSelection.assem.TempSet;
 
 /**
