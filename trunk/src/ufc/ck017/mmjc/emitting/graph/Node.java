@@ -6,7 +6,7 @@ import java.util.List;
 public class Node {
 
 	Graph mygraph;
-	int mykey;
+	private int mykey;
 
 	public LinkedList<Node> succs = new LinkedList<Node>();
 	LinkedList<Node> preds = new LinkedList<Node>();
@@ -14,7 +14,7 @@ public class Node {
 	
 	public Node(Graph g) {
 		mygraph = g;
-		mykey = g.nodecount++;
+		setMykey(g.nodecount++);
 		g.mynodes.add(this);
 	}
 
@@ -55,7 +55,15 @@ public class Node {
 	}
 
 	public String toString() {
-		return String.valueOf(mykey);
+		return String.valueOf(getMykey());
+	}
+
+	public void setMykey(int mykey) {
+		this.mykey = mykey;
+	}
+
+	public int getMykey() {
+		return mykey;
 	}
 
 }
