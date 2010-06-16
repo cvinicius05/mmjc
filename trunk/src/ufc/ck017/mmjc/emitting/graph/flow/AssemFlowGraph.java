@@ -1,4 +1,4 @@
-package ufc.ck017.mmjc.instructionSelection.assem;
+package ufc.ck017.mmjc.emitting.graph.flow;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -8,8 +8,11 @@ import java.util.ListIterator;
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.LabelList;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.emitting.graph.FlowGraph;
 import ufc.ck017.mmjc.emitting.graph.Node;
+import ufc.ck017.mmjc.instructionSelection.assem.ALABEL;
+import ufc.ck017.mmjc.instructionSelection.assem.AMOVE;
+import ufc.ck017.mmjc.instructionSelection.assem.Instr;
+import ufc.ck017.mmjc.instructionSelection.assem.TempSet;
 
 public class AssemFlowGraph extends FlowGraph {
 	Hashtable<Label, Node> labeled;
