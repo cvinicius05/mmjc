@@ -10,7 +10,6 @@ import ufc.ck017.mmjc.activationRecords.temp.Temp;
 import ufc.ck017.mmjc.emitting.graph.Node;
 import ufc.ck017.mmjc.emitting.graph.flow.FlowGraph;
 import ufc.ck017.mmjc.instructionSelection.assem.AMOVE;
-import ufc.ck017.mmjc.instructionSelection.assem.Instr;
 import ufc.ck017.mmjc.instructionSelection.assem.TempSet;
 import ufc.ck017.mmjc.util.Pair;
 
@@ -20,16 +19,12 @@ public class Liveness extends InterferenceGraph {
 	private Dictionary<Node, TempSet> livein;
 	private Dictionary<Temp, Node> tnode;
 	private FlowGraph fgraph;
-	List<Instr> workListMoves;
-	Dictionary<Node, List<Instr>> moveList;
 
 	public Liveness(FlowGraph flow) {
 		fgraph = flow;
 		liveout = new Hashtable<Node, TempSet>(flow.size());
 		livein = new Hashtable<Node, TempSet>(flow.size());
 		tnode = new Hashtable<Temp, Node>((int)(flow.size()*0.6));
-		workListMoves = new LinkedList<Instr>();
-		moveList = new Hashtable<Node, List<Instr>>();
 		
 		for(Node n : flow) {
 			livein.put(n, new TempSet(flow.use(n)));
@@ -89,11 +84,6 @@ public class Liveness extends InterferenceGraph {
 		
 		for(Node n : fgraph.moves()) {
 			AMOVE m = (AMOVE)fgraph.getNodeInfo(n);
-			workListMoves.add(m);
-
-			moveList.get(tnode.get(m.dst)).add(0, m);
-			moveList.get(tnode.get(m.src)).add(0, m);
-
 			movelist.add(new Pair<Node>(tnode.get(m.dst), tnode.get(m.src)));
 		}
 		
