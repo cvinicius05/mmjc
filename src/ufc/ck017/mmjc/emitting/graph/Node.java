@@ -18,6 +18,10 @@ public class Node {
 		g.mynodes.add(this);
 	}
 
+	public Graph getMyGraph() {
+		return mygraph;
+	}
+	
 	public List<Node> adj() {
 		return adjlist;
 	}

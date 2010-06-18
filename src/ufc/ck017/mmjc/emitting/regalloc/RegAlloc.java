@@ -1,6 +1,7 @@
 package ufc.ck017.mmjc.emitting.regalloc;
 
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -18,12 +19,14 @@ import ufc.ck017.mmjc.instructionSelection.assem.Instr;
 
 public class RegAlloc implements TempMap{
 
-	private Frame frame = null;
+	private static Frame frame = null;
 	private FlowGraph fgraph;
 
-	private List<Node> spillWorklist, freezeWorklist, simplifyWorklist;
+	private List<Node> spillWorklist, freezeWorklist,
+		simplifyWorklist, coalescedNodes, spilledNodes;
 	private List<Instr> activeMoves, workListMoves;
 	private Dictionary<Node, List<Instr>> moveList;
+	private Dictionary<Node, Node> alias;
 	private int[] degree;
 	private static Stack<Node> stake = new Stack<Node>();
 
@@ -36,6 +39,10 @@ public class RegAlloc implements TempMap{
 		simplifyWorklist = new LinkedList<Node>();
 		workListMoves = new LinkedList<Instr>();
 		activeMoves = new LinkedList<Instr>();
+		moveList = new Hashtable<Node, List<Instr>>();
+		alias = new Hashtable<Node, Node>();
+		coalescedNodes = new LinkedList<Node>();
+		spilledNodes = new LinkedList<Node>();
 	}
 
 	@Override
@@ -69,7 +76,7 @@ public class RegAlloc implements TempMap{
 			degree[i] = n.degree();
 			i++;
 			if(n.degree() >= frame.registers().length) spillWorklist.add(n);
-			else if(MoveRelated(n)) freezeWorklist.add(n);
+			else if(moveRelated(n)) freezeWorklist.add(n);
 			else simplifyWorklist.add(n);
 		}
 	}
@@ -84,12 +91,12 @@ public class RegAlloc implements TempMap{
 		return l;
 	}
 
-	private boolean MoveRelated(Node n) {
+	private boolean moveRelated(Node n) {
 		if(!NodeMoves(n).isEmpty()) return true;
 		return false;
 	}
 	
-	private void EnableMoves(List<Node> list) {
+	private void enableMoves(List<Node> list) {
 		List<Instr> l;
 		for(Node n : list) {
 			l = NodeMoves(n);
@@ -100,16 +107,16 @@ public class RegAlloc implements TempMap{
 		}
 	}
 	
-	private void DecrementDegree(Node n) {
+	private void decrementDegree(Node n) {
 		int d = degree[n.getMykey()];
 		degree[n.getMykey()]--;
 		if(d <= frame.registers().length) {
 			List<Node> list = new LinkedList<Node>(n.adj());
 			list.add(n);
-			EnableMoves(list);
+			enableMoves(list);
 			spillWorklist.remove(n);
 
-			if(MoveRelated(n))
+			if(moveRelated(n))
 				freezeWorklist.add(n);
 			else
 				simplifyWorklist.add(n);
@@ -122,8 +129,63 @@ public class RegAlloc implements TempMap{
 		Node n = simplifyWorklist.remove(0);
 		stake.push(n);
 		for(Node node : n.adj()) {
-			DecrementDegree(node);
+			decrementDegree(node);
 		}
+	}
+	
+	private boolean isPrecolored(Node n) {
+		return frame.tempMap(((Liveness) n.getMyGraph()).gtemp(n)) != null;
+	}
+	
+	private void addWorkList(Node n) {
+		if(!isPrecolored(n) && !moveRelated(n) && degree[n.getMykey()] < frame.registers().length) {
+			freezeWorklist.remove(n);
+			simplifyWorklist.add(n);
+		}
+	}
+	
+	private boolean conservative(List<Node> nodes) {
+		int k = 0;
+		for(Node n : nodes) {
+			if(degree[n.getMykey()] >= frame.registers().length)
+				k++;
+		}
+		
+		return k < frame.registers().length;
+	}
+	
+	private Node getAlias(Node n) {
+		if(coalescedNodes.contains(n))
+			return getAlias(alias.get(n));
+		else return n;
+	}
+	
+	private void combine(Node u, Node v) {
+		if(freezeWorklist.contains(v))
+			freezeWorklist.remove(v);
+		else spillWorklist.remove(v);
+		
+		coalescedNodes.add(v);
+		alias.put(v, u);
+		
+		// moveList[u] ← moveList[u] ∪ moveList[v]
+		moveList.get(u).addAll(moveList.get(v));
+		LinkedList<Node> list = new LinkedList<Node>();
+		list.add(v);
+		enableMoves(list);
+		
+		for(Node n : v.adj()) {
+			v.getMyGraph().addEdge(v, n);
+			decrementDegree(n);
+		}
+		
+		if(degree[u.getMykey()] >= frame.registers().length && freezeWorklist.contains(u)) {
+			freezeWorklist.remove(u);
+			spillWorklist.add(u);
+		}
+	}
+	
+	public void Coalesce() {
 		
 	}
 }
