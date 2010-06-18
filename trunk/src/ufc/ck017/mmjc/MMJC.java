@@ -56,6 +56,11 @@ public class MMJC {
 						)
 				);
 			}
+			
+			for(List<Instr> list : ilistlist) {
+				for(Instr instr : list)
+					System.out.println(instr);
+			}
 				
 		} catch (Exception e) {
 			e.printStackTrace();
