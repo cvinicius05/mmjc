@@ -1,13 +1,13 @@
 package ufc.ck017.mmjc.instructionSelection.jouette;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
 import ufc.ck017.mmjc.activationRecords.frame.JouetteFrame;
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.LabelList;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.activationRecords.temp.TempList;
 import ufc.ck017.mmjc.instructionSelection.assem.*;
 import ufc.ck017.mmjc.translate.tree.*;
 
@@ -20,20 +20,25 @@ public class Codegen {
 		this.frame = frame;
 	}
 
-	private TempList L(Temp h, TempList t) {
-		return new TempList(h,t);
+	private List<Temp> L(Temp... temps) {
+		LinkedList<Temp> list = new LinkedList<Temp>();
+		
+		for(Temp t : temps)
+			list.add(t);
+		
+		return list;
 	}
 
 	private void emit(Instr inst) {
 		ilist.add(inst);
 	}
 
-	public InstrList codegen(Stm s) {
+	public List<Instr> codegen(Stm s) {
 		ilist = new LinkedList<Instr>();
 		
 		munchStm(s);
 		
-		return new InstrList(ilist);
+		return ilist;
 	}
 
 	private void munchStm(Stm stm) {
@@ -53,32 +58,32 @@ public class Codegen {
 		
 		switch (relop) {
 			case CJUMP.GE:
-				emit(new OPER("BRANCHGE if `s0 >= `s1 goto `j0\n", null, L(l, L(r, null)), new LabelList(ltrue, null)));
+				emit(new OPER("BRANCHGE if `s0 >= `s1 goto `j0\n", null, L(l, r), new LabelList(ltrue, null)));
 				emit(new OPER("JUMP goto `j0\n", null, null, new LabelList(lfalse, null)));
 				break;
 	
 			case CJUMP.GT:
-				emit(new OPER("BRANCHLT if `s1 < `s0 goto `j0\n", null, L(l, L(r, null)), new LabelList(ltrue, null)));
+				emit(new OPER("BRANCHLT if `s1 < `s0 goto `j0\n", null, L(l, r), new LabelList(ltrue, null)));
 				emit(new OPER("JUMP goto `j0\n", null, null, new LabelList(lfalse, null)));
 				break;
 	
 			case CJUMP.EQ:
-				emit(new OPER("BRANCHEQ if `s0 = `s1 goto `j0\n", null, L(l, L(r, null)), new LabelList(ltrue, null)));
+				emit(new OPER("BRANCHEQ if `s0 = `s1 goto `j0\n", null, L(l, r), new LabelList(ltrue, null)));
 				emit(new OPER("JUMP goto `j0\n", null, null, new LabelList(lfalse, null)));
 				break;
 				
 			case CJUMP.NE:
-				emit(new OPER("BRANCHNE if `s0 != `s1 goto `j0\n", null, L(l, L(r, null)), new LabelList(ltrue, null)));
+				emit(new OPER("BRANCHNE if `s0 != `s1 goto `j0\n", null, L(l, r), new LabelList(ltrue, null)));
 				emit(new OPER("JUMP goto `j0\n", null, null, new LabelList(lfalse, null)));
 				break;
 				
 			case CJUMP.LE:
-				emit(new OPER("BRANCHGE if `s1 >= `s0 goto `j0\n", null, L(l, L(r, null)), new LabelList(ltrue, null)));
+				emit(new OPER("BRANCHGE if `s1 >= `s0 goto `j0\n", null, L(l, r), new LabelList(ltrue, null)));
 				emit(new OPER("JUMP goto `j0\n", null, null, new LabelList(lfalse, null)));
 				break;
 				
 			case CJUMP.LT:
-				emit(new OPER("BRANCHLT if `s0 < `s1 goto `j0\n", null, L(l, L(r, null)), new LabelList(ltrue, null)));
+				emit(new OPER("BRANCHLT if `s0 < `s1 goto `j0\n", null, L(l, r), new LabelList(ltrue, null)));
 				emit(new OPER("JUMP goto `j0\n", null, null, new LabelList(lfalse, null)));
 				break;
 			default:
@@ -102,7 +107,7 @@ public class Codegen {
 				&& ((BINOP)dst.exp).right instanceof CONST) {
 
 			emit(new OPER("STORE M[`s0 +" + ((CONST)((BINOP)dst.exp).right).value + "] <- `s1\n",
-					null, L(munchExp(((BINOP)dst.exp).left), L(munchExp(src), null))));
+					null, L(munchExp(((BINOP)dst.exp).left), munchExp(src))));
 		}
 
 		// MOVE(MEM(BINOP(PLUS, CONST(i), e1)), e2)
@@ -110,22 +115,22 @@ public class Codegen {
 				&& ((BINOP)dst.exp).left instanceof CONST) {
 
 			emit(new OPER("STORE M[`s0 +" + ((CONST)((BINOP)dst.exp).left).value + "] <- `s1\n",
-					null, L(munchExp(((BINOP)dst.exp).right), L(munchExp(src), null))));
+					null, L(munchExp(((BINOP)dst.exp).right), munchExp(src))));
 		}
 
 		// MOVE(MEM(e1), MEM(e2))
 		else if (src instanceof MEM) {
-			emit(new OPER("MOVEM M[`s0] <- M[`s1]\n", null, L(munchExp(dst.exp), L(munchExp(((MEM)src).exp), null))));
+			emit(new OPER("MOVEM M[`s0] <- M[`s1]\n", null, L(munchExp(dst.exp), munchExp(((MEM)src).exp))));
 		}
 
 		// MOVE(MEM(CONST(i)), e2))
 		else if(dst.exp instanceof CONST) {
-			emit(new OPER("STORE M[`s0 +" + ((CONST)dst.exp).value + "] <- `s1\n", null, L(JouetteFrame.R0(), L(munchExp(src), null))));
+			emit(new OPER("STORE M[`s0 +" + ((CONST)dst.exp).value + "] <- `s1\n", null, L(JouetteFrame.R0(), munchExp(src))));
 		}
 
 		// MOVE(MEM(e1), e2)
 		else {
-			emit(new OPER("STORE M[`s0] <- `s1\n", null, L(munchExp(dst.exp), L(munchExp(src), null))));
+			emit(new OPER("STORE M[`s0] <- `s1\n", null, L(munchExp(dst.exp), munchExp(src))));
 		}
 	}
 
@@ -154,27 +159,34 @@ public class Codegen {
 
 	private Temp munchCALL(CALL e) {
 		Temp r = munchExp(e.func);
-		TempList l = munchArgs(0, e.args);
-		emit(new OPER("CALL `s0\n", JouetteFrame.calldefs(), L(r,l)));
+		List<Temp> l = munchArgs(e.args);
+		l.add(0, r);
+		
+		emit(new OPER("CALL `s0\n", JouetteFrame.calldefs(), l));
 		return frame.RV();
 	}
 
-	private TempList munchArgs(int i, ExpList args) {
-		if(args == null) return null;
-		
+	private List<Temp> munchArgs(ExpList args) {
 		Temp[] argregs = JouetteFrame.argRegs();
-		if(i >= argregs.length) {
-			emit(new OPER("STORE M[`s0+" + i*frame.wordSize() + "] <- `s1\n", null, L(frame.FP(), L(munchExp(args.head), null))));
-			return munchArgs(i+1, args.tail);
-		} else {
-			emit(new OPER("STORE `d0 <- `s0\n", L(argregs[i], null), L(munchExp(args.head), null)));
-			return new TempList(argregs[i], munchArgs(i+1, args.tail));
+		LinkedList<Temp> list = new LinkedList<Temp>();
+		int i = 0;
+		
+		for(Exp e : args) {
+			if(i >= argregs.length) {
+				emit(new OPER("STORE M[`s0+" + i*frame.wordSize() + "] <- `s1\n", null, L(frame.FP(), munchExp(e))));
+			} else {
+				emit(new OPER("STORE `d0 <- `s0\n", L(argregs[i]), L(munchExp(e))));
+				list.addLast(argregs[i]);
+			}
+			i++;
 		}
+		
+		return list;
 	}
 
 	private Temp munchNAME(Label label) {
 		Temp r = new Temp();
-		emit(new OPER("LOAD `d0 <- `j0\n", L(r, null), null, new LabelList(label, null)));
+		emit(new OPER("LOAD `d0 <- `j0\n", L(r), null, new LabelList(label, null)));
 		return r;
 	}
 
@@ -184,23 +196,23 @@ public class Codegen {
 		// MEM(BINOP(PLUS, e1, CONST(i)))
 		if(exp instanceof BINOP && ((BINOP)exp).binop == BINOP.PLUS && ((BINOP)exp).right instanceof CONST) {
 			emit(new OPER("LOAD `d0 <- M[`s0 + " + ((CONST)((BINOP)exp).right).value + "]\n",
-					L(r, null), L(munchExp(((BINOP)exp).left), null)));
+					L(r), L(munchExp(((BINOP)exp).left))));
 		}
 
 		// MEM(BINOP(PLUS, CONST(i), e1))
 		else if(exp instanceof BINOP && ((BINOP)exp).binop == BINOP.PLUS && ((BINOP)exp).left instanceof CONST) {
 			emit(new OPER("LOAD `d0 <- M[`s0 + " + ((CONST)((BINOP)exp).left).value + "]\n",
-					L(r, null), L(munchExp(((BINOP)exp).right), null)));
+					L(r), L(munchExp(((BINOP)exp).right))));
 		}
 
 		// MEM(CONST (i))
 		else if(exp instanceof CONST) {
-			emit(new OPER("LOAD `d0 <- M[`s0+" + ((CONST)exp).value + "]\n", L(r, null), L(JouetteFrame.R0(), null)));
+			emit(new OPER("LOAD `d0 <- M[`s0+" + ((CONST)exp).value + "]\n", L(r), L(JouetteFrame.R0())));
 		}
 
 		// MEM(e1)
 		else {
-			emit(new OPER("LOAD `d0 <- M[`s0+`s1]\n", L(r, null), L(munchExp(exp), L(JouetteFrame.R0(), null))));
+			emit(new OPER("LOAD `d0 <- M[`s0+`s1]\n", L(r), L(munchExp(exp), JouetteFrame.R0())));
 		}
 		return r;
 	}
@@ -210,37 +222,37 @@ public class Codegen {
 
 		// BINOP(PLUS, e1, CONST(i))
 		if(binop == BINOP.PLUS && right instanceof CONST) {
-			emit(new OPER("ADDI `d0 <- `s0 + " + ((CONST)right).value + "\n", L(r, null), L(munchExp(left), null)));
+			emit(new OPER("ADDI `d0 <- `s0 + " + ((CONST)right).value + "\n", L(r), L(munchExp(left))));
 		}
 
 		// BINOP(PLUS, CONST(i), e1)
 		else if(binop == BINOP.PLUS && left instanceof CONST) {
-			emit(new OPER("ADDI `d0 <- `s0 + " + ((CONST)left).value + "\n", L(r, null), L(munchExp(right), null)));
+			emit(new OPER("ADDI `d0 <- `s0 + " + ((CONST)left).value + "\n", L(r), L(munchExp(right))));
 		}
 
 		// BINOP(MINUS, e1, CONST(i))
 		if(binop == BINOP.MINUS && right instanceof CONST) {
-			emit(new OPER("SUBI `d0 <- `s0 - " + ((CONST)right).value + "\n", L(r, null), L(munchExp(left), null)));
+			emit(new OPER("SUBI `d0 <- `s0 - " + ((CONST)right).value + "\n", L(r), L(munchExp(left))));
 		}
 
 		// BINOP(PLUS, e1, e2)
 		else if(binop == BINOP.PLUS) {
-			emit(new OPER("ADD `d0 <- `s0 + `s1\n", L(r, null), L(munchExp(left), L(munchExp(right), null))));
+			emit(new OPER("ADD `d0 <- `s0 + `s1\n", L(r), L(munchExp(left), munchExp(right))));
 		}
 
 		// BINOP(MUL, e1, e2)
 		else if(binop == BINOP.MUL) {
-			emit(new OPER("MUL `d0 <- `s0 * `s1\n", L(r, null), L(munchExp(left), L(munchExp(right), null))));
+			emit(new OPER("MUL `d0 <- `s0 * `s1\n", L(r), L(munchExp(left), munchExp(right))));
 		}
 
 		// BINOP(DIV, e1, e2)
 		else if(binop == BINOP.DIV) {
-			emit(new OPER("DIV `d0 <- `s0 / `s1\n", L(r, null), L(munchExp(left), L(munchExp(right), null))));
+			emit(new OPER("DIV `d0 <- `s0 / `s1\n", L(r), L(munchExp(left), munchExp(right))));
 		}
 
 		// BINOP(MINUS, e1, e2)
 		else if(binop == BINOP.MINUS) {
-			emit(new OPER("SUB `d0 <- `s0 - `s1\n", L(r, null), L(munchExp(left), L(munchExp(right), null))));
+			emit(new OPER("SUB `d0 <- `s0 - `s1\n", L(r), L(munchExp(left), munchExp(right))));
 		}
 
 		return r;
@@ -249,7 +261,7 @@ public class Codegen {
 	private Temp munchCONST(int value) {
 		Temp r = new Temp();
 		// CONST(i)
-		emit(new OPER("ADDI `d0 <- `s0 + " + value + "\n", L(r, null), L(JouetteFrame.R0(), null)));
+		emit(new OPER("ADDI `d0 <- `s0 + " + value + "\n", L(r), L(JouetteFrame.R0())));
 		return r;
 	}
 

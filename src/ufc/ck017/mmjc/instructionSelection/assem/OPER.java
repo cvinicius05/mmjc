@@ -1,22 +1,24 @@
 package ufc.ck017.mmjc.instructionSelection.assem;
 
+import java.util.List;
+
 import ufc.ck017.mmjc.activationRecords.temp.LabelList;
-import ufc.ck017.mmjc.activationRecords.temp.TempList;
+import ufc.ck017.mmjc.activationRecords.temp.Temp;
 
 public class OPER extends Instr {
-	public TempList dst; 
-	public TempList src;
+	public List<Temp> dst; 
+	public List<Temp> src;
 	public Targets jump;
 
-	public OPER(String a, TempList d, TempList s, LabelList j) {
+	public OPER(String a, List<Temp> d, List<Temp> s, LabelList j) {
 		assem=a; dst=d; src=s; jump=new Targets(j);
 	}
-	public OPER(String a, TempList d, TempList s) {
+	public OPER(String a, List<Temp> d, List<Temp> s) {
 		assem=a; dst=d; src=s; jump=null;
 	}
 
-	public TempList use() {return src;}
-	public TempList def() {return dst;}
+	public List<Temp> use() {return src;}
+	public List<Temp> def() {return dst;}
 	public Targets jumps() {return jump;}
 
 }
