@@ -21,10 +21,11 @@ public class RegAlloc implements TempMap{
 
 	private static Frame frame = null;
 	private FlowGraph fgraph;
+	private InterferenceGraph igraph;
 
 	private List<Node> spillWorklist, freezeWorklist,
 		simplifyWorklist, coalescedNodes, spilledNodes;
-	private List<Instr> activeMoves, workListMoves;
+	private List<Instr> activeMoves, workListMoves, coalescedMoves, constrainedMoves;
 	private Dictionary<Node, List<Instr>> moveList;
 	private Dictionary<Node, Node> alias;
 	private int[] degree;
@@ -33,6 +34,7 @@ public class RegAlloc implements TempMap{
 	public RegAlloc(Frame f, List<Instr> ilist) {
 		frame = f;
 		fgraph = new AssemFlowGraph(ilist);
+		igraph = new Liveness(fgraph);
 
 		spillWorklist = new LinkedList<Node>();
 		freezeWorklist = new LinkedList<Node>();
@@ -60,7 +62,6 @@ public class RegAlloc implements TempMap{
 	}
 
 	public void MakeLists() {
-		InterferenceGraph igraph = new Liveness(fgraph);
 		degree = new int[igraph.size()];
 
 		for(Node n : fgraph.moves()) {
@@ -186,6 +187,33 @@ public class RegAlloc implements TempMap{
 	}
 	
 	public void Coalesce() {
+		if(!workListMoves.isEmpty()) {
+			Node u, v;
+			
+			AMOVE m = (AMOVE) workListMoves.get(0);
+			Node x = igraph.tnode(m.dst);
+			Node y = igraph.tnode(m.src);
+			
+			if(isPrecolored(y)) {
+				u = y;
+				v = x;
+			} else {
+				u = x;
+				v = y;
+			}
+			workListMoves.remove(m);
+			
+			if(u == v) {
+				coalescedMoves.add(m);
+				addWorkList(u);
+			} else if(isPrecolored(v) || u.adj(v)) {
+				constrainedMoves.add(m);
+				addWorkList(u);
+				addWorkList(v);
+			} else if(isPrecolored(u) ) {
+				// TODO
+			}
+		}
 		
 	}
 }
