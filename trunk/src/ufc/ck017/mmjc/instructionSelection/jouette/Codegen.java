@@ -144,7 +144,7 @@ public class Codegen {
 	}
 
 	private void munchJUMP(Exp exp, LabelList targets) {
-		emit(new OPER("JUMP goto `j0\n", null, null, targets));
+		emit(new OPER("JUMP goto `s0\n", null, L(munchNAME(targets.head))));
 	}
 
 	public Temp munchExp(Exp e) {
@@ -175,7 +175,7 @@ public class Codegen {
 			if(i >= argregs.length) {
 				emit(new OPER("STORE M[`s0+" + i*frame.wordSize() + "] <- `s1\n", null, L(frame.FP(), munchExp(e))));
 			} else {
-				emit(new OPER("STORE `d0 <- `s0\n", L(argregs[i]), L(munchExp(e))));
+				emit(new AMOVE("ADDI `d0 <- `s0 + 0\n", argregs[i], munchExp(e)));
 				list.addLast(argregs[i]);
 			}
 			i++;
@@ -186,7 +186,7 @@ public class Codegen {
 
 	private Temp munchNAME(Label label) {
 		Temp r = new Temp();
-		emit(new OPER("LOAD `d0 <- `j0\n", L(r), null, new LabelList(label, null)));
+		emit(new OPER("LOADL `d0 <- `j0\n", L(r), null, new LabelList(label, null)));
 		return r;
 	}
 
@@ -212,7 +212,7 @@ public class Codegen {
 
 		// MEM(e1)
 		else {
-			emit(new OPER("LOAD `d0 <- M[`s0+`s1]\n", L(r), L(munchExp(exp), JouetteFrame.R0())));
+			emit(new OPER("LOAD `d0 <- M[`s0 + 0]\n", L(r), L(munchExp(exp))));
 		}
 		return r;
 	}
@@ -261,7 +261,13 @@ public class Codegen {
 	private Temp munchCONST(int value) {
 		Temp r = new Temp();
 		// CONST(i)
-		emit(new OPER("ADDI `d0 <- `s0 + " + value + "\n", L(r), L(JouetteFrame.R0())));
+		if(value == 0)
+			emit(new AMOVE("ADDI `d0 <- `s0 + 0\n", r, JouetteFrame.R0()));
+		else if (value > 0)
+			emit(new OPER("ADDI `d0 <- `s0 + " + value + "\n", L(r), L(JouetteFrame.R0())));
+		else
+			emit(new OPER("SUBI `d0 <- `s0 - " + value + "\n", L(r), L(JouetteFrame.R0())));
+		
 		return r;
 	}
 

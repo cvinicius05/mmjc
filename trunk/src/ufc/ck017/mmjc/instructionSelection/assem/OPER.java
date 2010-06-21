@@ -11,7 +11,7 @@ public class OPER extends Instr {
 	public Targets jump;
 
 	public OPER(String a, List<Temp> d, List<Temp> s, LabelList j) {
-		assem=a; dst=d; src=s; jump=new Targets(j);
+		assem=a; dst=d; src=s; jump=(j == null ? null : new Targets(j));
 	}
 	public OPER(String a, List<Temp> d, List<Temp> s) {
 		assem=a; dst=d; src=s; jump=null;

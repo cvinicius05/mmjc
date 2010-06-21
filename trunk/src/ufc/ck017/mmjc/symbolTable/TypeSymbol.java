@@ -151,7 +151,7 @@ public class TypeSymbol {
 		if(typeName instanceof AInttType) return INTT;
 		else if(typeName instanceof AIntvType) return INTV;
 		else if(typeName instanceof ABoolType) return BOOL;
-		else if(typeName instanceof AClassType) typeDict.get(((AClassType) typeName).getId().getText().intern());
+		else if(typeName instanceof AClassType) return TypeSymbol.search(((AClassType) typeName).getId().getText());
 		
 		return null;
 	}

@@ -83,7 +83,6 @@ public class TableVisitor extends DepthFirstAdapter {
 		}
 
 		newclass = new Class(pclass, node.getName(), numVars, numMethods);
-		pclass.setChildrenClass(newclass);
 
 		if(table.getClass(newclass.getName()) != null)
 			errors.addError(SemanticError.alreadyDefinedClass(node.getName()));

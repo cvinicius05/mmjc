@@ -7,7 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import ufc.ck017.mmjc.activationRecords.temp.Label;
+import ufc.ck017.mmjc.activationRecords.temp.Temp;
+import ufc.ck017.mmjc.instructionSelection.assem.ALABEL;
+import ufc.ck017.mmjc.instructionSelection.assem.AMOVE;
 import ufc.ck017.mmjc.instructionSelection.assem.Instr;
+import ufc.ck017.mmjc.instructionSelection.assem.OPER;
 import ufc.ck017.mmjc.lexer.Lexer;
 import ufc.ck017.mmjc.node.Start;
 import ufc.ck017.mmjc.parser.Parser;
@@ -47,22 +52,38 @@ public class MMJC {
 
 			for(Frag f : t.getResult()) {
 				ilistlist.add(
-						f.getframe().codegen(
+						f.getframe().procEntryExit3(
+								f.getframe().procEntryExit2(f.getframe().codegen(
 								new TraceSchedule(
 										new BasicBlocks(
 												Canon.linearize(f.getBody())
 										)
 								).stms
-						)
+						)))
 				);
 			}
 			
-			int i = 0;
 			for(List<Instr> list : ilistlist) {
-				for(Instr instr : list)
-					if(instr == null) i++;
+				for(Instr instr : list) {
+					System.out.print((instr.assem == "" ? "EMPTYYYYY\n" : instr.assem));
+					if(instr instanceof AMOVE)
+						System.out.println("\t["+((AMOVE)instr).dst+" # "+((AMOVE)instr).src+"]");
+					else if(instr instanceof OPER) {
+						System.out.print("\t[");
+						if(instr.def() != null)
+							for(Temp d : instr.def())
+								System.out.print(d+", ");
+						System.out.print(" # ");
+						if(instr.use() != null)
+							for(Temp s : instr.use())
+								System.out.print(s+", ");
+						if(instr.jumps() != null)
+							for(Label j : instr.jumps())
+								System.out.print(j+", ");
+						System.out.println("]");
+					}
+				}
 			}
-			System.out.println(i+" nulls encontrados na lista");
 				
 		} catch (Exception e) {
 			e.printStackTrace();
