@@ -40,14 +40,9 @@ class Parent extends GrandParent{
 	Child c;
 	
 	public GrandParent returnParent() {
-		c.getIntOfParent();
+		int i;
+		i = c.getIntOfParent();
 		return new GrandParent();
-	}
-	
-	public Parent(boolean b, Parent p, Child c) {
-		this.b = b;
-		this.p = p;
-		this.c = c;
 	}
 	
 	public int returnInt() {
@@ -58,11 +53,6 @@ class Parent extends GrandParent{
 class GrandParent {
 	int[] intarray;
 	Child c;
-
-	public GrandParent(int[] v, Child c) {
-		intarray = v;
-		this.c = c;
-	}
 	
 	public int[] returnArray(boolean b) {
 		int[] intarray;
@@ -71,14 +61,14 @@ class GrandParent {
 		
 		while(b && 22 < 3) {
 			b = !b;
-			c.getIntOfParent() = this.c.getIntOfParent() + returnSelf(this).returnInt();
+			intarray[12] = c.getIntOfParent() + this.returnSelf(this).returnInt();
 		}
 		
 		return intarray; 
 	}
 	
 	public int returnInt() {
-		return returnSelf(this).intarray[this.returnArray(true)[c.getGrandParent().returnInt()]+15*this.c.getIntOfParent()];
+		return this.returnSelf(this)*intarray[this.returnArray(true)[c.getGrandParent().returnInt()]+15*c.getIntOfParent()];
 	}
 	
 	public GrandParent returnSelf(GrandParent o) {

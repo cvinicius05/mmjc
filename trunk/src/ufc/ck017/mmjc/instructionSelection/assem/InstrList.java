@@ -41,7 +41,7 @@ public class InstrList implements Iterable<Instr>{
 		}
 
 		public boolean hasNext() {
-			return tail != null;
+			return l != null;
 		}
 
 		public Instr next() {

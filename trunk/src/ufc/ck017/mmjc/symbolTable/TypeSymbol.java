@@ -32,6 +32,9 @@ public class TypeSymbol {
 	
 	private String typeName;
 	private static Dictionary<String, TypeSymbol> typeDict = new Hashtable<String, TypeSymbol>();
+	private static TypeSymbol INTT = new TypeSymbol("int");
+	private static TypeSymbol INTV = new TypeSymbol("int[]");
+	private static TypeSymbol BOOL = new TypeSymbol("boolean");
 	
 	private TypeSymbol(String type) {
 		typeName = type.intern();
@@ -48,7 +51,7 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado a string <b>int</b>.
 	 */
 	public static TypeSymbol getIntTSymbol() {
-		return TypeSymbol.symbol("int");
+		return INTT;
 	}
 	
 	/**
@@ -58,7 +61,7 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado a string <b>int[]</b>.
 	 */
 	public static TypeSymbol getIntVSymbol() {
-		return TypeSymbol.symbol("int[]");
+		return INTV;
 	}
 	
 	/**
@@ -68,7 +71,7 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado a string <b>boolean</b>.
 	 */
 	public static TypeSymbol getBoolSymbol() {
-		return TypeSymbol.symbol("boolean");
+		return BOOL;
 	}
 	
 	/**
@@ -81,14 +84,13 @@ public class TypeSymbol {
 	 * @return s&iacute;mbolo associado ao tipo de <b>PType</b>.
 	 */
 	public static TypeSymbol symbol(PType ptype) {
-		String s = null;
 
-		if(ptype instanceof AInttType) s = "int";
-		else if(ptype instanceof AIntvType) s = "int[]";
-		else if(ptype instanceof ABoolType) s = "boolean";
-		else if(ptype instanceof AClassType) s = ((AClassType) ptype).getId().getText();
-
-		return TypeSymbol.symbol(s);
+		if(ptype instanceof AInttType) return INTT;
+		else if(ptype instanceof AIntvType) return INTV;
+		else if(ptype instanceof ABoolType) return BOOL;
+		else if(ptype instanceof AClassType) return TypeSymbol.symbol(((AClassType) ptype).getId().getText());
+		
+		else return null;
 	}
 
 	/**
@@ -146,14 +148,12 @@ public class TypeSymbol {
 	 * e null, caso contr&aacute;rio.
 	 */
 	public static TypeSymbol search(PType typeName){
-		String s = null;
-
-		if(typeName instanceof AInttType) s = "int";
-		else if(typeName instanceof AIntvType) s = "int[]";
-		else if(typeName instanceof ABoolType) s = "boolean";
-		else if(typeName instanceof AClassType) s = ((AClassType) typeName).getId().getText();
+		if(typeName instanceof AInttType) return INTT;
+		else if(typeName instanceof AIntvType) return INTV;
+		else if(typeName instanceof ABoolType) return BOOL;
+		else if(typeName instanceof AClassType) typeDict.get(((AClassType) typeName).getId().getText().intern());
 		
-		return typeDict.get(s.intern());
+		return null;
 	}
 
 	@Override

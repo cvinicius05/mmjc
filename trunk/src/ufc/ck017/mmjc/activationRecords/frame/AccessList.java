@@ -23,7 +23,7 @@ public class AccessList implements Iterable<Access> {
 		}
 
 		public boolean hasNext() {
-			return tail != null;
+			return l != null;
 		}
 
 		public Access next() {

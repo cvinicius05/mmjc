@@ -181,11 +181,11 @@ public final class AVatbStatement extends PStatement
 
 	@Override
 	public int getLine() {
-		return _i_.getLine();
+		return _id_.getLine();
 	}
 
 	@Override
 	public int getPos() {
-		return _i_.getPos();
+		return _id_.getPos();
 	}
 }

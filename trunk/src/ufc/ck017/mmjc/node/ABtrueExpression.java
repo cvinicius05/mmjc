@@ -3,7 +3,6 @@
 package ufc.ck017.mmjc.node;
 
 import ufc.ck017.mmjc.analysis.*;
-import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
 public final class ABtrueExpression extends PExpression
@@ -34,7 +33,7 @@ public final class ABtrueExpression extends PExpression
     {
         ((Analysis) sw).caseABtrueExpression(this);
     }
-    
+
     public TTrue getTrue()
     {
         return this._true_;

@@ -33,7 +33,7 @@ public class ExpList implements Iterable<Exp> {
 		}
 
 		public boolean hasNext() {
-			return tail != null;
+			return l != null;
 		}
 
 		public Exp next() {

@@ -138,11 +138,11 @@ public final class AMultExpression extends PExpression
 
 	@Override
 	public int getLine() {
-		return _r_.getLine();
+		return _l_.getLine();
 	}
 
 	@Override
 	public int getPos() {
-		return _r_.getPos();
+		return _l_.getPos();
 	}
 }

@@ -1,7 +1,9 @@
 package ufc.ck017.mmjc.instructionSelection.assem;
 
+import java.util.List;
+
 import ufc.ck017.mmjc.activationRecords.temp.Label;
-import ufc.ck017.mmjc.activationRecords.temp.TempList;
+import ufc.ck017.mmjc.activationRecords.temp.Temp;
 
 public class ALABEL extends Instr {
 	public Label label;
@@ -10,7 +12,7 @@ public class ALABEL extends Instr {
 		assem=a; label=l;
 	}
 
-	public TempList use() {return null;}
-	public TempList def() {return null;}
+	public List<Temp> use() {return null;}
+	public List<Temp> def() {return null;}
 	public Targets jumps()	{return null;}
 }

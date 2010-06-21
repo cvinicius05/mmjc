@@ -4,5 +4,4 @@ package ufc.ck017.mmjc.node;
 
 public abstract class PType extends Node
 {
-    // Empty body
 }

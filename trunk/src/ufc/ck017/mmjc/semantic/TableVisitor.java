@@ -83,6 +83,7 @@ public class TableVisitor extends DepthFirstAdapter {
 		}
 
 		newclass = new Class(pclass, node.getName(), numVars, numMethods);
+		pclass.setChildrenClass(newclass);
 
 		if(table.getClass(newclass.getName()) != null)
 			errors.addError(SemanticError.alreadyDefinedClass(node.getName()));
@@ -93,6 +94,7 @@ public class TableVisitor extends DepthFirstAdapter {
 	@Override
 	public void outAMethod(AMethod node) {
 		Method newm = new Method(node.getId(), currentclass, node.getType(), node.getParam().size(), node.getLocal().size());
+		AVar avar = null;
 
 		for(PVar var : node.getLocal()) {
 			if(!newm.addLocalVar((AVar) var))
@@ -100,8 +102,15 @@ public class TableVisitor extends DepthFirstAdapter {
 		}
 
 		for(PVar var : node.getParam()) {
-			if(!newm.addParamater((AVar) var))
+			avar = (AVar) var;
+			
+			if(TypeSymbol.search(avar.getType()) == null) {
+				TypeSymbol type = TypeSymbol.symbol(avar.getType());
+				extendedNotDefined.put(type, new Class(null, type));
+			}
+			if(!newm.addParamater((AVar) var)) {
 				errors.addError(SemanticError.alreadyDefinedVar(((AVar)var).getId()));
+			}
 		}
 
 		if(!currentclass.addMethod(newm)) {
@@ -120,8 +129,15 @@ public class TableVisitor extends DepthFirstAdapter {
 	 */
 	private void manageClassTables(Class newclass, LinkedList<PVar> vars) {
 		Class actualclass = null;
+		AVar avar = null;
 
 		for(PVar var : vars) {
+			avar = (AVar) var;
+			
+			if(TypeSymbol.search(avar.getType()) == null) {
+				TypeSymbol type = TypeSymbol.symbol(avar.getType());
+				extendedNotDefined.put(type, new Class(null, type));
+			}
 			if(!newclass.addLocalVar((AVar) var))
 				errors.addError(SemanticError.alreadyDefinedVar(((AVar)var).getId()));
 		}

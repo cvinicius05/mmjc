@@ -109,7 +109,8 @@ public class SymbolTable implements SymbolTableInterface {
 
 		if(TypeSymbol.getBoolSymbol().equals(type) ||
 				TypeSymbol.getIntTSymbol().equals(type) ||
-				TypeSymbol.getIntVSymbol().equals(type))
+				TypeSymbol.getIntVSymbol().equals(type) ||
+				symboltable.get(type) == null)
 			return false;
 
 		return true;
@@ -152,7 +153,7 @@ public class SymbolTable implements SymbolTableInterface {
 		Class c = symboltable.get(ctype);
 		VarSymbol msymbol = VarSymbol.search(mid.getText());
 
-		if(msymbol == null) return null;
+		if(msymbol == null || c.isPhantom()) return null;
 		while(c != null) {
 			if((m = c.getMethod(msymbol)) != null)
 				return m;

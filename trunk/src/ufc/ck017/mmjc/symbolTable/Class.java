@@ -54,6 +54,7 @@ public class Class extends ScopeEntry {
 			this.fieldsIndex = c.fieldsIndex;
 			this.methods = c.methods;
 			this.parent = c.parent;
+			this.fields = c.fields;
 			phantom = false;
 		}
 	}
@@ -172,6 +173,10 @@ public class Class extends ScopeEntry {
 	@Override
 	public ScopeEntry getSuperScope() {
 		return null;
+	}
+	
+	public boolean isPhantom(){
+		return phantom;
 	}
 
 }

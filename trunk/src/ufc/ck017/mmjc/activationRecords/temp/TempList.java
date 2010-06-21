@@ -43,7 +43,7 @@ public class TempList implements Iterable<Temp> {
 		}
 
 		public boolean hasNext() {
-			return tail != null;
+			return l != null;
 		}
 
 		public Temp next() {
