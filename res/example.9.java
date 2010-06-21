@@ -20,7 +20,7 @@ class Child extends Parent {
 		return g.returnSelf(g);
 	}
 	
-	public boolean setParent(Patent p) {
+	public boolean setParent(Parent p) {
 		parent = p;
 		return true;
 	}
@@ -68,7 +68,7 @@ class GrandParent {
 	}
 	
 	public int returnInt() {
-		return this.returnSelf(this)*intarray[this.returnArray(true)[c.getGrandParent().returnInt()]+15*c.getIntOfParent()];
+		return this.returnSelf(this).returnInt()*intarray[this.returnArray(true)[c.getGrandParent().returnInt()]+15*c.getIntOfParent()];
 	}
 	
 	public GrandParent returnSelf(GrandParent o) {

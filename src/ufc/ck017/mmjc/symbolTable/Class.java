@@ -55,6 +55,7 @@ public class Class extends ScopeEntry {
 			this.methods = c.methods;
 			this.parent = c.parent;
 			this.fields = c.fields;
+			this.tempChildrenList = c.tempChildrenList;
 			phantom = false;
 		}
 	}

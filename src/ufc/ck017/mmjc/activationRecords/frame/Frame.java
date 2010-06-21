@@ -28,6 +28,6 @@ public abstract class Frame implements TempMap{
 	
 	public abstract List<Stm> procEntryExit1(List<Stm> body);
 	public abstract List<Instr> procEntryExit2(List<Instr> body);
-	//public abstract Proc procEntryExit3(List<Instr> body);
+	public abstract List<Instr> procEntryExit3(List<Instr> body);
 	public abstract List<Instr> codegen(StmList stms);
 }
