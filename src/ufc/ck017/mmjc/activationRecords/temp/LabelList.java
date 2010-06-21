@@ -25,7 +25,7 @@ public class LabelList implements Iterable<Label> {
 		}
 
 		public boolean hasNext() {
-			return tail != null;
+			return l != null;
 		}
 
 		public Label next() {

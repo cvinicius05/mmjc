@@ -57,10 +57,12 @@ public class MMJC {
 				);
 			}
 			
+			int i = 0;
 			for(List<Instr> list : ilistlist) {
 				for(Instr instr : list)
-					System.out.println(instr);
+					if(instr == null) i++;
 			}
+			System.out.println(i+" nulls encontrados na lista");
 				
 		} catch (Exception e) {
 			e.printStackTrace();

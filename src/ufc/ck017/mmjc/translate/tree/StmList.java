@@ -2,7 +2,7 @@ package ufc.ck017.mmjc.translate.tree;
 
 import java.util.Iterator;
 
-public class StmList {
+public class StmList implements Iterable<Stm> {
 
 	public Stm head;
 	public StmList tail;
@@ -32,7 +32,7 @@ public class StmList {
 		}
 
 		public boolean hasNext() {
-			return tail != null;
+			return l != null;
 		}
 
 		public Stm next() {

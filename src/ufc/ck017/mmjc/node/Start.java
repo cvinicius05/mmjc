@@ -132,11 +132,11 @@ public final class Start extends Node
 
 	@Override
 	public int getLine() {
-		return _pProgram_.getLine();
+		return 0;
 	}
 
 	@Override
 	public int getPos() {
-		return _pProgram_.getPos();
+		return 0;
 	}
 }

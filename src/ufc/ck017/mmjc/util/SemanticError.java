@@ -40,8 +40,8 @@ public class SemanticError {
 		return err+mname.getLine()+','+mname.getPos()+"]:\n\tIdentifier \'"+mname.getText()+"\' either does not name a method of class <"+cname+"> or the parameters are invalid.";
 	}
 
-	public static String invalidAtbToObject(TId idst, TypeSymbol classtype) {
-		return err+idst.getLine()+','+idst.getPos()+"]:\n\tIdentifier has type <"+TypeSymbol.search(idst)+"> but was assigned an incompatible value of type <"+classtype+">.";
+	public static String invalidAtbToObject(TId idst, TypeSymbol actualtype, TypeSymbol wrongtype) {
+		return err+idst.getLine()+','+idst.getPos()+"]:\n\tIdentifier has type <"+actualtype+"> but was assigned an incompatible value of type <"+wrongtype+">.";
 	}
 
 	public static String incompatibleClassAtb(TId idst, TypeSymbol classtype) {

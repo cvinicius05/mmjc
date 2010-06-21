@@ -76,6 +76,5 @@ public abstract class Node implements Switchable, Cloneable
     }
     
     public abstract int getLine();
-    
     public abstract int getPos();
 }

@@ -98,7 +98,7 @@ public class Method extends ScopeEntry {
 	 * false caso contr&aacute;rio.
 	 */
 	public boolean addParamater(AVar var) {
-		Binding b = new Binding(VarSymbol.symbol(var.getId()), TypeSymbol.symbol(var.getType()));
+		Binding b = new Binding(VarSymbol.symbol(var.getId()), TypeSymbol.search(var.getType()));
 
 		if(parameters.contains(b)) return false;
 

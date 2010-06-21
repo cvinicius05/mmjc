@@ -3,7 +3,6 @@
 package ufc.ck017.mmjc.node;
 
 import ufc.ck017.mmjc.analysis.*;
-import ufc.ck017.mmjc.translate.tree.Exp;
 
 @SuppressWarnings("nls")
 public final class ABoolType extends PType
@@ -34,7 +33,7 @@ public final class ABoolType extends PType
     {
         ((Analysis) sw).caseABoolType(this);
     }
-    
+
     public TBool getBool()
     {
         return this._bool_;

@@ -100,7 +100,7 @@ public class TypeChecker extends DepthFirstAdapter {
 			TypeSymbol classtype = expression.getType();
 						
 			if(!table.isClass(classtype)) 
-				errors.addError(SemanticError.invalidAtbToObject(identifier, classtype));
+				errors.addError(SemanticError.invalidAtbToObject(identifier, table.getType(identifier), classtype));
 			else if(!table.isSubclassOf(idst, classtype))
 				errors.addError(SemanticError.incompatibleClassAtb(identifier, classtype));
 		} else if(!table.isVar(identifier) || exst == null || !idst.equals(exst)) {

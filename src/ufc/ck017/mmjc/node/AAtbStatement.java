@@ -138,11 +138,11 @@ public final class AAtbStatement extends PStatement
 
 	@Override
 	public int getLine() {
-		return _expression_.getLine();
+		return _id_.getLine();
 	}
 
 	@Override
 	public int getPos() {
-		return _expression_.getPos();
+		return _id_.getPos();
 	}
 }
