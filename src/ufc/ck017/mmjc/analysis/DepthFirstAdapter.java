@@ -745,6 +745,10 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseABtrueExpression(ABtrueExpression node)
     {
         inABtrueExpression(node);
+        if(node.getTrue() != null)
+        {
+            node.getTrue().apply(this);
+        }
         outABtrueExpression(node);
     }
 
@@ -762,6 +766,10 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseABfalseExpression(ABfalseExpression node)
     {
         inABfalseExpression(node);
+        if(node.getFalse() != null)
+        {
+            node.getFalse().apply(this);
+        }
         outABfalseExpression(node);
     }
 
@@ -779,6 +787,10 @@ public class DepthFirstAdapter extends AnalysisAdapter
     public void caseASelfExpression(ASelfExpression node)
     {
         inASelfExpression(node);
+        if(node.getThis() != null)
+        {
+            node.getThis().apply(this);
+        }
         outASelfExpression(node);
     }
 
