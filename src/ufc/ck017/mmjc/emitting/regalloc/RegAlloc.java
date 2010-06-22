@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Stack;
 
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
+import ufc.ck017.mmjc.activationRecords.frame.JouetteFrame;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.activationRecords.temp.TempMap;
 import ufc.ck017.mmjc.emitting.graph.Node;
 import ufc.ck017.mmjc.emitting.graph.flow.AssemFlowGraph;
 import ufc.ck017.mmjc.emitting.graph.flow.FlowGraph;
@@ -17,7 +17,7 @@ import ufc.ck017.mmjc.emitting.graph.interference.Liveness;
 import ufc.ck017.mmjc.instructionSelection.assem.AMOVE;
 import ufc.ck017.mmjc.instructionSelection.assem.Instr;
 
-public class RegAlloc implements TempMap{
+public class RegAlloc{
 
 	private static Frame frame = null;
 	private FlowGraph fgraph;
@@ -25,9 +25,13 @@ public class RegAlloc implements TempMap{
 
 	private List<Node> spillWorklist, freezeWorklist,
 		simplifyWorklist, coalescedNodes, spilledNodes;
-	private List<Instr> activeMoves, workListMoves, coalescedMoves, constrainedMoves;
+	private List<Instr> activeMoves, workListMoves,
+		coalescedMoves, constrainedMoves, frozenMoves;
+
 	private Dictionary<Node, List<Instr>> moveList;
 	private Dictionary<Node, Node> alias;
+	public Hashtable<Temp, String> colors;
+
 	private int[] degree;
 	private static Stack<Node> stake = new Stack<Node>();
 
@@ -35,25 +39,26 @@ public class RegAlloc implements TempMap{
 		frame = f;
 		fgraph = new AssemFlowGraph(ilist);
 		igraph = new Liveness(fgraph);
+		degree = new int[igraph.size()];
 
 		spillWorklist = new LinkedList<Node>();
 		freezeWorklist = new LinkedList<Node>();
 		simplifyWorklist = new LinkedList<Node>();
-		workListMoves = new LinkedList<Instr>();
-		activeMoves = new LinkedList<Instr>();
-		moveList = new Hashtable<Node, List<Instr>>();
-		alias = new Hashtable<Node, Node>();
 		coalescedNodes = new LinkedList<Node>();
 		spilledNodes = new LinkedList<Node>();
-	}
 
-	@Override
-	public String tempMap(Temp t) {
-		// TODO Auto-generated method stub
-		return null;
+		activeMoves = new LinkedList<Instr>();
+		workListMoves = new LinkedList<Instr>();
+		coalescedMoves = new LinkedList<Instr>();
+		constrainedMoves = new LinkedList<Instr>();
+		frozenMoves = new LinkedList<Instr>();
+		
+		moveList = new Hashtable<Node, List<Instr>>();
+		alias = new Hashtable<Node, Node>();
 	}
 
 	public FlowGraph LivenessAnalysis(List<Instr> ilist) {
+		colors = (Hashtable<Temp, String>) ((JouetteFrame)frame).getTempMap().clone();
 		return fgraph = new AssemFlowGraph(ilist);
 	}
 
@@ -62,8 +67,6 @@ public class RegAlloc implements TempMap{
 	}
 
 	public void MakeLists() {
-		degree = new int[igraph.size()];
-
 		for(Node n : fgraph.moves()) {
 			AMOVE m = (AMOVE)fgraph.getNodeInfo(n);
 			workListMoves.add(m);
@@ -186,6 +189,14 @@ public class RegAlloc implements TempMap{
 		}
 	}
 	
+	public boolean OK(Node v, Node u) {
+		for(Node n : v.adj()) {
+			if(!(degree[n.getMykey()] < frame.registers().length || isPrecolored(n) || n.adj(u)))
+				return false;
+		}
+		return true;
+	}
+	
 	public void Coalesce() {
 		if(!workListMoves.isEmpty()) {
 			Node u, v;
@@ -193,6 +204,9 @@ public class RegAlloc implements TempMap{
 			AMOVE m = (AMOVE) workListMoves.get(0);
 			Node x = igraph.tnode(m.dst);
 			Node y = igraph.tnode(m.src);
+			
+			x = getAlias(x);
+			y = getAlias(y);
 			
 			if(isPrecolored(y)) {
 				u = y;
@@ -202,6 +216,8 @@ public class RegAlloc implements TempMap{
 				v = y;
 			}
 			workListMoves.remove(m);
+			LinkedList<Node> list = new LinkedList<Node>(u.adj());
+			list.addAll(v.adj());
 			
 			if(u == v) {
 				coalescedMoves.add(m);
@@ -210,10 +226,115 @@ public class RegAlloc implements TempMap{
 				constrainedMoves.add(m);
 				addWorkList(u);
 				addWorkList(v);
-			} else if(isPrecolored(u) ) {
-				// TODO
+			} else if((isPrecolored(u) && OK(v, u)) || (!isPrecolored(u) && conservative(list))) {
+				coalescedMoves.add(m);
+				combine(u, v);
+				addWorkList(u);
+			} else activeMoves.add(m);
+		}
+	}
+	
+	private void freezeMoves(Node n) {
+		Node x, y, v;
+		for(Instr m : NodeMoves(n)) {
+			x = igraph.tnode(((AMOVE)m).dst);
+			y = igraph.tnode(((AMOVE)m).src);
+			
+			if(getAlias(x) == getAlias(y))
+				v = getAlias(x);
+			else v = getAlias(y);
+			
+			activeMoves.remove(m);
+			frozenMoves.add(m);
+			if(freezeWorklist.contains(v) && NodeMoves(v).isEmpty()) {
+				freezeWorklist.remove(v);
+				simplifyWorklist.add(v);
 			}
 		}
+	}
+	
+	public void Freeze() {
+		if(!freezeWorklist.isEmpty()) {
+			Node n = freezeWorklist.get(0);
+			freezeWorklist.remove(0);
+			simplifyWorklist.add(n);
+			freezeMoves(n);
+		}
+	}
+	
+	public void SelectSpill() {
+		if(!spillWorklist.isEmpty()) {
+			Node less = spillWorklist.get(0);
+			for(Node n : spillWorklist) {
+				if(n.degree() > less.degree())
+					less = n;
+			}
+
+			spillWorklist.remove(less);
+			simplifyWorklist.add(less);
+			freezeMoves(less);
+		}
+	}
+	
+	public void AssignColors() {
+		Node n;
+		LinkedList<String> okColors = new LinkedList<String>(colors.values());
+
+		while(!stake.isEmpty()) {
+			n = stake.pop();
+
+			for(Node w : n.adj()) {
+				Node v = getAlias(w);
+				if(isPrecolored(v))
+					okColors.remove(colors.get(v));
+			}
+			
+			if(okColors.isEmpty()) spilledNodes.add(n);
+			else colors.put(igraph.gtemp(n), okColors.getFirst());
+			
+			for(Node u : coalescedNodes) {
+				colors.remove(u);
+				colors.put(igraph.gtemp(u), colors.get(getAlias(u)));
+			}
+		}
+	}
+	
+	private List<Temp> spills() {
+		LinkedList<Temp> slist = new LinkedList<Temp>();
+		for(Node n : spilledNodes) {
+			slist.add(igraph.gtemp(n));
+		}
 		
+		return slist;
+	}
+	
+	public void RewriteProgram(List<Instr> ilist) {
+		((JouetteFrame) frame).spill(ilist, spills());
+		
+		spilledNodes = new LinkedList<Node>();
+		coalescedNodes = new LinkedList<Node>();
+	}
+	
+	public List<Instr> Main(List<Instr> ilist) {
+		do{
+			fgraph = LivenessAnalysis(ilist);
+			igraph = Build(fgraph);
+			MakeLists();
+
+			do{
+				if(!simplifyWorklist.isEmpty()) Simplify();
+				else if(!workListMoves.isEmpty()) Coalesce();
+				else if(!freezeWorklist.isEmpty()) Freeze();
+				else if(!spillWorklist.isEmpty()) SelectSpill();
+				
+			}while(!simplifyWorklist.isEmpty() || !workListMoves.isEmpty() ||
+					!freezeWorklist.isEmpty() || !spillWorklist.isEmpty());
+
+			AssignColors();
+			if(!spilledNodes.isEmpty())
+				RewriteProgram(ilist);
+		}while(!spilledNodes.isEmpty());
+		
+		return ilist;
 	}
 }

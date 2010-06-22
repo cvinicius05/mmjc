@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
-import ufc.ck017.mmjc.instructionSelection.assem.ALABEL;
 import ufc.ck017.mmjc.instructionSelection.assem.AMOVE;
 import ufc.ck017.mmjc.instructionSelection.assem.Instr;
 import ufc.ck017.mmjc.instructionSelection.assem.OPER;

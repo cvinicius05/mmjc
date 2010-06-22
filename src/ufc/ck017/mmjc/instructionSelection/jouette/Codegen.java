@@ -1,7 +1,9 @@
 package ufc.ck017.mmjc.instructionSelection.jouette;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import ufc.ck017.mmjc.activationRecords.frame.Frame;
 import ufc.ck017.mmjc.activationRecords.frame.JouetteFrame;
@@ -10,6 +12,7 @@ import ufc.ck017.mmjc.activationRecords.temp.LabelList;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
 import ufc.ck017.mmjc.instructionSelection.assem.*;
 import ufc.ck017.mmjc.translate.tree.*;
+import ufc.ck017.mmjc.translate.tree.LABEL;
 
 public class Codegen {
 
@@ -18,6 +21,11 @@ public class Codegen {
 
 	public Codegen(Frame frame) {
 		this.frame = frame;
+	}
+
+	public Codegen(Frame frame, ListIterator<Instr> i) {
+		this.frame = frame;
+		ilist = new LinkedList<Instr>((Collection<? extends Instr>) i);
 	}
 
 	private List<Temp> L(Temp... temps) {
@@ -43,7 +51,7 @@ public class Codegen {
 
 	private void munchStm(Stm stm) {
 		if (stm instanceof MOVE) munchMove(((MOVE)stm).dst, ((MOVE)stm).src);
-		else if(stm instanceof ufc.ck017.mmjc.translate.tree.LABEL) munchLABEL(((ufc.ck017.mmjc.translate.tree.LABEL)stm).label);
+		else if(stm instanceof LABEL) munchLABEL(((LABEL)stm).label);
 		else if(stm instanceof JUMP) munchJUMP(((JUMP)stm).exp, ((JUMP)stm).targets);
 		else if(stm instanceof CJUMP) munchCJUMP(((CJUMP)stm).relop, ((CJUMP)stm).left, ((CJUMP)stm).right, ((CJUMP)stm).iftrue, ((CJUMP)stm).iffalse);
 		else if(stm instanceof SEQ) munchSEQ(((SEQ)stm).left, ((SEQ)stm).right);
@@ -154,7 +162,8 @@ public class Codegen {
 		else if(e instanceof TEMP) return munchTEMP(((TEMP)e).temp);
 		else if(e instanceof NAME) return munchNAME(((NAME)e).label);
 		else if(e instanceof CALL) return munchCALL((CALL)e);
-		else return null;
+		
+		return null;
 	}
 
 	private Temp munchCALL(CALL e) {
