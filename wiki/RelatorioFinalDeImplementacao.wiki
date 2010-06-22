@@ -46,7 +46,7 @@ As produções da gramática residem na seção _Productions_ do arquivo *MiniJa
 
 As produções são marcadas pela construção `nonterm = right-side`, onde `nonterm` é um não-terminal da gramática sendo definida e `right-side` é um agrupamento de terminais e/ou não-terminais, representando a derivação equivalente da gramática.
 
-Esta sintaxe é intercalada por instruções entre chaves ( '{' ), que são as regras de transformação da CST na AST desejada. Neste momento, essas regras são desimportantes.
+Esta sintaxe é intercalada por instruções entre chaves ( '{' e '}' ), que são as regras de transformação da CST na AST desejada. Neste momento, essas regras são desimportantes.
 
 Algumas modificações na gramática do livro-texto foram necessárias, de forma a retirar as suas ambiguidades. Dado que o SableCC constrói parsers LALR(1), a inserção de não-terminais para marcar a precedência de operadores foi suficiente para eliminar quase a totalidade das ambiguidades, não sendo necessário que nos preocupássemos com eliminação de recursões ou uso de _left-factoring_, por exemplo.
 
@@ -71,7 +71,7 @@ Como trata-se de uma linguagem imperativa (já que é uma restrição da linguag
 
 A imagem abaixo mostra um resumo em UML de como implementamos a tabela de símbolos no MMJC.
 
-||*Imagem aqui*||
+http://img33.imageshack.us/img33/8162/symboltableinterface.png
 
 Para preenchermos a tabela de símbolos com as informações pertinentes, fazemos uso de um objeto da classe *`TableVisitor`*, que herda de *`DepthFirstAdapter`*, a classe do SableCC que implementa o padrão Visitor.
 
@@ -154,6 +154,8 @@ O conjunto de nós disponíveis é o seguinte:
 
 A cada nó, criamos uma sub-árvore IR utilizando o conjunto de nós acima para representar equivalentemente o nó da AST visitado.
 
+Por exemplo, para alocarmos um novo vetor de inteiros, realizamos uma chamada externa a uma função que denominamos `malloc` e que supomos que existe e aceita exatamente um parâmetro, que é o tamanho em bytes do espaço de memória a alocar. Com isso, calculamos o número de campos da classe à qual o objeto a ser instanciado pertence e passamos essa quantidade de _wordSize_ bytes para a função malloc, inicializando a memória alocada com zeros logo em seguida.
+
 Realizamos uma série de testes com todas as construções permitidas da MiniJava e em nenhuma delas obtivemos comportamentos inesperados.
 
 Esta fase também foi completamente integrada com as fases anteriores.
@@ -163,14 +165,60 @@ O arquivo *example.9_ir.txt" mostra a árvore gerada a partir da execução do p
 
 = Fase II: Backend =
 == Canonicalização ==
+Nesta fase, visamos simplificar a árvore gerada pela tradução para uma mais fácil de converter para a linguagem-alvo escolhida, eliminando nós que não tem representação imediata e substituindo por uma árvore equivalente cuja representação seja mais simples ou mais fácil de ser obtida.
+
+No nosso caso, eliminamos os nós `ESEQ` e `SEQ`, transformando a entrada em uma lista de *`Stm`*, e reorganizamos os nós `CALL` de forma que nenhum nó `CALL` seja descendente direto de outro.
+
+A fase de canonicalização foi implementada pelo autor do livro-texto. Por isso, não realizamos testes desta fase. Entretanto, fizemos a integração com as outras fases do compilador de forma completa.
 
 == Blocos Básicos e Traços ==
+A fase de divisão em blocos básicos e geração de traços visa encontrar uma sequência de ordenação das instruções do programa de tal forma que o uso da memória cache do processador seja o mais otimizado que conseguirmos. Além disso, organizamos os nós `CJUMP` de forma que o seu _label_ falso o acompanhe imediatamente, já que não há (se há é muito raro) arquitetura que suporte desvio para dois endereços distintos em uma mesma instrução, e sim vão para um destino quando a condição é verdadeira e ignoram a instrução quando falsa.
+
+Esta fase também foi implementada pelo autor do livro-texto, por isso não fizemos testes. A integração com as outras fases também foi completa e sem limitações.
 
 == Seleção de Instruções ==
+Na fase de seleção de instruções tentamos transformar a representação intermediária obtida das fases anteriores num "pseudo-assembler", onde as ocorrências de registradores nessas instruções são substituídas por representações especiais que nos permitirão, após a fase de alocação de registradores, gerar finalmente o código-alvo.
+
+Nós utilizamos o algoritmo _maximalMunch_ para realizar o que chamamos de "ladrilhamento" da árvore, que consiste em escolher instruções da linguagem-alvo que correspondam a uma certa sub-árvore da IR que obtivemos, de forma a não deixarmos nenhum nó "descoberto" e nem o "cubramos" mais de uma vez.
+
+Com isso, temos a garantia de que estamos gerando o código de máquina equivalente àquela representação intermediária que possuíamos.
+
+Por exemplo, se temos a instrução `ADDI d0 <- s0 + c`, onde `d0` é o registrador de destino da operação, `s0` é um registrador que armazena um dos parâmetros da operação e `c` é uma constante natural, podemos ladrilhar, por exemplo, a seguinte sub-árvore IR, caso ela venha a ocorrer no código:
+  `BINOP(BINOP.`_`PLUS`_`, e, 4)`
+onde e é uma outra expressão e 4 é o valor de c para este caso.
+
+O que devemos fazer é criar um novo temporário para associar o resultado desta operação e retorná-lo ao chamador para que esse registrador possa ser usado em outra operação, assim como o da operação `e` será usado para substituir s0.
+
+A fase de seleção de instruções foi perfeitamente integrada com as fases anteriores de compilação. Alguns testes foram realizados, mas infelizmente nem todos os casos puderam ser analisados.
+
+O "pseudo-assembler" do arquivo *example.9.java* está no arquivo *example.9_instr.txt*, na na seção de [http://code.google.com/p/mmjc/downloads/list Downloads] do projeto. A cada pseudo-instrução é relacionado abaixo o conjunto dos registradores que são definidos e os que são usados, e os labels utilizados naquela instrução. Esses serão os valores que irão substituir respectivamente `d`,,k,,, `s`,,k,, e `j`,,k,,, onde k é um valor natural e sequencial.
 
 == Análise de Longevidade ==
+Na fase de análise de longevidade determinamos quais dos temporários criados e utilizados ao longo do programa para representar os registradores reais de máquina podem interferir entre si, nos proibindo assim de fazer com que sejam alocados em um mesmo registrador.
+
+Para isso, fazemos uso de um grafo de fluxo de execução, onde cada instrução é um nó no grafo, e existe uma aresta direcionada _uv_ se é possível existir uma execução do programa em que a instrução _v_ é executada imediatamente após a instrução _u_.
+
+De posse desse grafo, podemos então determinar quais temporários estão "vivos" ao mesmo tempo em cada uma de duas arestas. Um temporário está vivo em uma aresta se existe um caminho de algum nó onde ele seja definido para o nó _v_ destino da aresta em questão sem que este caminho passe por um nó (inclusive o nó _v_) que o também defina.
+
+A partir do grafo de fluxo e das informações de quais temporários estão vivos ao mesmo tempo, podemos construir outro grafo, mas desta vez não-direcionado e onde cada vértice representa um temporário. Nesse novo grafo, existe uma aresta _uv_ se o temporário _u_ está vivo em alguma aresta onde o temporário _v_ também esteja. Ou seja, _u_ e _v_ interferem entre si e, por consequência, não podem ser atribuídos a um mesmo registrador.
+
+Este grafo é o grafo manipulado pela última fase de compilação do nosso projeto, a alocação de registradores.
+
+Infelizmente não tivemos tempo de executar os testes pertinentes a esta fase para eliminarmos os erros que viessem a ocorrer. Mesmo assim, o módulo foi integrado corretamente ao programa.
 
 == Seleção de Registradores ==
+Na última fase de compilação do nosso projeto, finalmente geramos as instruções assembler da linguagem-alvo.
+
+Utilizamos uma heurística de coloração de grafos que deseja apenas garantir uma coloração própria com k cores do grafo de interferência obtido na fase anterior, onde k é o número de registradores disponíveis na máquina-alvo.
+
+Se supusermos que cada cor nessa coloração obtida é na verdade um registrador, pela definição de coloração própria de vértices de um grafo não-direcionado, temos a alocação de registradores desejada, onde todos os temporários que possuírem a mesma cor podem ser associados sem conflitos a esse mesmo registrador.
+
+No nosso projeto, implementamos a aglutinação de nós relacionados a MOVE utilizando os dois critérios conservadores vistos na disciplina: Briggs e George. Aplicamos primeiramente o critério de George, por ser mais fácil de verificar. Caso suas condições não sejam satisfeitas, verificamos se o critério de Briggs é satisfeito.
+
+Além disso, implementamos o transbordamento e o recomeço, assim como sugerido pelo projeto do livro-texto.
+
+Infelizmente também não pudemos realizar os testes pertinentes a esta fase e, com isso, não eliminamos possíveis problemas que tenham passado despercebidos. Entretanto, também integramos corretamente esta fase de compilação às fases restantes do programa.
+
 
 = Tabela de Síntese =
 A tabela a seguir resume as informações deste relatório quanto ao estado de cada fase da compilação:
