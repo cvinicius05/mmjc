@@ -234,6 +234,26 @@ public class Codegen {
 		if(binop == BINOP.MINUS && right instanceof CONST) {
 			emit(new OPER("SUBI `d0 <- `s0 - " + ((CONST)right).value + "\n", L(r), L(munchExp(left))));
 		}
+		
+		// BINOP(XOR, e1, CONST(i))
+		else if(binop == BINOP.XOR && right instanceof CONST) {
+			emit(new OPER("XORI `d0 <- `s0 ^ " + ((CONST)right).value + "\n", L(r), L(munchExp(left))));
+		}
+
+		// BINOP(XOR, CONST(i), e1)
+		else if(binop == BINOP.XOR && left instanceof CONST) {
+			emit(new OPER("XORI `d0 <- `s0 ^ " + ((CONST)left).value + "\n", L(r), L(munchExp(right))));
+		}
+		
+		// BINOP(AND, e1, CONST(i))
+		else if(binop == BINOP.AND && right instanceof CONST) {
+			emit(new OPER("ANDI `d0 <- `s0 & " + ((CONST)right).value + "\n", L(r), L(munchExp(left))));
+		}
+
+		// BINOP(AND, CONST(i), e1)
+		else if(binop == BINOP.AND && left instanceof CONST) {
+			emit(new OPER("ANDI `d0 <- `s0 & " + ((CONST)left).value + "\n", L(r), L(munchExp(right))));
+		}
 
 		// BINOP(PLUS, e1, e2)
 		else if(binop == BINOP.PLUS) {
@@ -253,6 +273,15 @@ public class Codegen {
 		// BINOP(MINUS, e1, e2)
 		else if(binop == BINOP.MINUS) {
 			emit(new OPER("SUB `d0 <- `s0 - `s1\n", L(r), L(munchExp(left), munchExp(right))));
+		}
+		
+		// BINOP(XOR, e1, e2)
+		else if(binop == BINOP.XOR) {
+			emit(new OPER("XOR `d0 <- `s0 ^ `s1\n", L(r), L(munchExp(left), munchExp(right))));
+		}
+		
+		else if(binop == BINOP.AND) {
+			emit(new OPER("AND `d0 <- `s0 & `s1\n", L(r), L(munchExp(left), munchExp(right))));
 		}
 
 		return r;
