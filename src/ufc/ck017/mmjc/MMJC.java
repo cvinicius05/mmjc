@@ -1,14 +1,19 @@
 package ufc.ck017.mmjc;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PushbackReader;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import ufc.ck017.mmjc.activationRecords.frame.JouetteFrame;
 import ufc.ck017.mmjc.activationRecords.temp.Label;
 import ufc.ck017.mmjc.activationRecords.temp.Temp;
+import ufc.ck017.mmjc.emitting.regalloc.RegAlloc;
 import ufc.ck017.mmjc.instructionSelection.assem.AMOVE;
 import ufc.ck017.mmjc.instructionSelection.assem.Instr;
 import ufc.ck017.mmjc.instructionSelection.assem.OPER;
@@ -31,9 +36,10 @@ public class MMJC {
 	 */
 	public static void main(String[] args) {
 		try {
-			LinkedList<List<Instr>> ilistlist = new LinkedList<List<Instr>>();
-			String filename = new Scanner(System.in).nextLine();
-			Lexer l = new Lexer (new PushbackReader (new BufferedReader(new FileReader(filename)), 4096));
+			String infilename = new Scanner(System.in).nextLine();
+			String outfilename = new String(infilename.substring(0, infilename.lastIndexOf('.'))+".S");
+			Writer out = new BufferedWriter(new FileWriter(outfilename), 4096);
+			Lexer l = new Lexer (new PushbackReader (new BufferedReader(new FileReader(infilename)), 4096));
 			Parser p = new Parser (l);
 			Start start = p.parse ();
 
@@ -50,19 +56,25 @@ public class MMJC {
 			start.apply(t);
 
 			for(Frag f : t.getResult()) {
-				ilistlist.add(
-						f.getframe().procEntryExit3(
-								f.getframe().procEntryExit2(f.getframe().codegen(
+				List<Instr> instr = f.getframe().procEntryExit2(
+						f.getframe().codegen(
 								new TraceSchedule(
 										new BasicBlocks(
 												Canon.linearize(f.getBody())
 										)
 								).stms
-						)))
+						)
 				);
+				
+				new RegAlloc(f.getframe(), instr);
+				
+				instr = f.getframe().procEntryExit3(instr);
+				
+				for(Instr i : instr)
+					out.write(i.format(f.getframe()));
 			}
 			
-			for(List<Instr> list : ilistlist) {
+			/*for(List<Instr> list : ilistlist) {
 				for(Instr instr : list) {
 					System.out.print((instr.assem == "" ? "EMPTYYYYY\n" : instr.assem));
 					if(instr instanceof AMOVE)
@@ -82,7 +94,7 @@ public class MMJC {
 						System.out.println("]");
 					}
 				}
-			}
+			}*/
 				
 		} catch (Exception e) {
 			e.printStackTrace();

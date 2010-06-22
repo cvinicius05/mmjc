@@ -1,6 +1,7 @@
 package ufc.ck017.mmjc.emitting.regalloc;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class RegAlloc{
 
 	private Dictionary<Node, List<Instr>> moveList;
 	private Dictionary<Node, Node> alias;
-	public Hashtable<Temp, String> colors;
+	public HashMap<Temp, String> colors;
 
 	private int[] degree;
 	private static Stack<Node> stake = new Stack<Node>();
@@ -55,10 +56,15 @@ public class RegAlloc{
 		
 		moveList = new Hashtable<Node, List<Instr>>();
 		alias = new Hashtable<Node, Node>();
+		
+		Main(ilist);
+		
+		JouetteFrame.tempMap = colors;
 	}
 
+	@SuppressWarnings("unchecked")
 	public FlowGraph LivenessAnalysis(List<Instr> ilist) {
-		colors = (Hashtable<Temp, String>) ((JouetteFrame)frame).getTempMap().clone();
+		colors = (HashMap<Temp, String>) JouetteFrame.tempMap.clone();
 		return fgraph = new AssemFlowGraph(ilist);
 	}
 
@@ -315,7 +321,7 @@ public class RegAlloc{
 		coalescedNodes = new LinkedList<Node>();
 	}
 	
-	public List<Instr> Main(List<Instr> ilist) {
+	private List<Instr> Main(List<Instr> ilist) {
 		do{
 			fgraph = LivenessAnalysis(ilist);
 			igraph = Build(fgraph);
