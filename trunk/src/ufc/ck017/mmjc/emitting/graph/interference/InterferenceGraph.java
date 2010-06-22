@@ -13,6 +13,6 @@ abstract public class InterferenceGraph extends Graph {
 	public abstract List<Pair<Node>> moves();
 
 	public int spillCost(Node node) {
-		return 1;
+		return node.degree();
 	}
 }
